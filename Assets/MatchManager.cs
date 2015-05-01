@@ -2,21 +2,16 @@
 using UnityEngine;
 
 // A class that manages the match.
+
 public class MatchManager : MonoBehaviour {
 
     const float TIME_DISPLAY_RULES = 5f; // Amount of time spent to display the rules
     float timerDisplayRules; // Timer to keep track of how long to display the rules
-
-    const float TIME_BEFORE_DRAWING_GUNS = .5f; // Time to wait (a small period) before the word "DRAW!" is displayed on-screen.
-    float timerBeforeDrawingGuns; // Timer that keeps track of when to display the word "DRAW!" on-screen.
-
-    const float TIME_TO_DISPLAY_DRAW_MESSAGE = .5f; // Amount of time the message "draw" message should display.
-    float timerToDisplayDrawMessage; // Timer to keep track of displaying the draw message.
-    bool displayDrawMessage; // Indicates whether we should display the "DRAW" message on-screen.
+    private bool displayRules; // Indicates whether we should display the rules
 
     GUIStyle startMessageStyle; // The style used for the text displaying the "DRAW" message.
-    const float DRAW_MESSAGE_WIDTH = 100f; // The width of the draw message.
-    const float DRAW_MESSAGE_HEIGHT = 50f; // The height of the draw message.
+    const float START_MESSAGE_WIDTH = 100f; // The width of the draw message.
+    const float START_MESSAGE_HEIGHT = 50f; // The height of the draw message.
 
     float timerToWaitAfterDrawBeforeBattle; // Amount of time to wait, after the message "DRAW" has appeared, and before the battle starts.
 
@@ -24,20 +19,23 @@ public class MatchManager : MonoBehaviour {
     private float timerToDisplayGoMessage; // Measures how the countdown over how long we should wait before displaying the "GO!" message.
     private const float TIME_TO_DISPLAY_GO_MESSAGE = .5f; // Amount of time to display the "GO!" message.
 
-    public List<GameObject> playerList;
+    public List<GameObject> playerList; // A list of GameObjects representing both players.
+
+    #if UNITY_EDITOR
+        ControlManager CONTROL_MANAGER;
+    #endif
 
 	// Load the match screen.
 	void Start () {
 
         // Set all the timers for doing stuff on-screen.
-        timerBeforeDrawingGuns = TIME_BEFORE_DRAWING_GUNS;
-        timerToDisplayDrawMessage = TIME_TO_DISPLAY_DRAW_MESSAGE;
         timerToWaitAfterDrawBeforeBattle = Helper.NextFloat(5f, 10f);
         timerToDisplayGoMessage = TIME_TO_DISPLAY_GO_MESSAGE;
+        timerDisplayRules = TIME_DISPLAY_RULES;
 
         // Don't display the messages for "GO!" or "DRAW!" at all, until time warrants it. 
-        displayDrawMessage = false;
         displayGoMessage = false;
+        displayRules = false;
 
         // Initialize the style for displaying the "GO!" and "DRAW!" messages.
         startMessageStyle = new GUIStyle();
@@ -50,35 +48,38 @@ public class MatchManager : MonoBehaviour {
         // PlayerScript.cs to each player.
         playerList = new List<GameObject>() {  GameObject.Find("Player1"), GameObject.Find("Player2") };
         foreach (GameObject player in playerList) {
-
             if (player.GetComponent<PlayerScript>() == null) {
                 player.AddComponent<PlayerScript>();
             }
             player.GetComponent<PlayerScript>().PreStart();
         }
 
-
+        #if UNITY_EDITOR
+        // If the namespace UnityEditor is defined, update the values of the input axes if the flag is set to true (
+        // do this in Global.cs).
+        if (Global.REDEFINE_INPUT_AXES) {
+            CONTROL_MANAGER = new ControlManager();
+            CONTROL_MANAGER.RedefineInputManager();
+        }
+        #endif
 	}
 	
 	// Update the match every frame.
 	void Update () {
 
-        // Update the timer before displaying the words DRAW! on-screen.
-        if (timerBeforeDrawingGuns > 0f) {
-            timerBeforeDrawingGuns -= Time.deltaTime;
-        }
-
-        // Display the words DRAW! on-screen if we are counting down the timer; otherwise, DON'T display the draw message.
-        if (timerBeforeDrawingGuns <= 0f && timerToDisplayDrawMessage > 0f) {
-            timerToDisplayDrawMessage -= Time.deltaTime;
-            displayDrawMessage = true;
+        // Display the rules on-screen.
+        if (timerDisplayRules > 0f) {
+            displayRules = true;
+            timerDisplayRules -= Time.deltaTime;
+            startMessageStyle.fontSize = 150;
         }
         else {
-            displayDrawMessage = false;
+            displayRules = false;
+            startMessageStyle.fontSize = 200;
         }
 
         // Then, wait a random amount of time between 5 to 10 seconds.
-        if (timerToDisplayDrawMessage <= 0f && timerToWaitAfterDrawBeforeBattle > 0f) {
+        if (timerDisplayRules <= 0f && timerToWaitAfterDrawBeforeBattle > 0f) {
             timerToWaitAfterDrawBeforeBattle -= Time.deltaTime;
         }
 
@@ -96,20 +97,21 @@ public class MatchManager : MonoBehaviour {
     // Update the display on-screen every frame.
     void OnGUI()
     {
-        // Display the draw message when the flag for it is activated.
-        if (displayDrawMessage) {
-            GUI.Label(new Rect((float)Screen.width / 2f - (DRAW_MESSAGE_WIDTH / 2f), 
-                               (float)Screen.height / 2f - (DRAW_MESSAGE_HEIGHT / 2f), 
-                               DRAW_MESSAGE_WIDTH, 
-                               DRAW_MESSAGE_HEIGHT), "DRAW!", startMessageStyle);
+        // Display the rules for the first 5 seconds (placeholder display for now).
+        if (displayRules) {
+            
+            GUI.Label(new Rect((float)Screen.width / 2f - (START_MESSAGE_WIDTH / 2f),
+                               (float)Screen.height / 2f - (START_MESSAGE_HEIGHT / 2f),
+                               START_MESSAGE_WIDTH,
+                               START_MESSAGE_HEIGHT), "VOXEL SUCKS ASS!", startMessageStyle);
         }
 
         // Display the message to begin shooting after somewhere between 5 to 10 seconds.
         if (displayGoMessage) {
-            GUI.Label(new Rect((float)Screen.width / 2f - (DRAW_MESSAGE_WIDTH / 2f),
-                       (float)Screen.height / 2f - (DRAW_MESSAGE_HEIGHT / 2f),
-                       DRAW_MESSAGE_WIDTH,
-                       DRAW_MESSAGE_HEIGHT), "SHOOT!", startMessageStyle);
+            GUI.Label(new Rect((float)Screen.width / 2f - (START_MESSAGE_WIDTH / 2f),
+                       (float)Screen.height / 2f - (START_MESSAGE_HEIGHT / 2f),
+                       START_MESSAGE_WIDTH,
+                       START_MESSAGE_HEIGHT), "DRAW!", startMessageStyle);
         }
 
 
