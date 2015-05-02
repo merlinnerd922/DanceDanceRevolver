@@ -16,4 +16,8 @@ public class Helper
         return (float)result;
     }
 
+    public static string GetPlayerAxis(int playerNum, PS4Control c)
+    {
+        return "Player" + playerNum.ToString() + c;
+    }
 }

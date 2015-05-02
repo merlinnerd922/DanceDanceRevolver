@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 // A class that manages the match.
-
 public class MatchManager : MonoBehaviour {
 
     const float TIME_DISPLAY_RULES = 5f; // Amount of time spent to display the rules
@@ -21,6 +21,8 @@ public class MatchManager : MonoBehaviour {
 
     public List<GameObject> playerList; // A list of GameObjects representing both players.
 
+    // Exclusive to Unity testing environments only. If run as the executable itself and not in the Unity window,
+    // this assignment will be ignored.
     #if UNITY_EDITOR
         ControlManager CONTROL_MANAGER;
     #endif
@@ -47,21 +49,28 @@ public class MatchManager : MonoBehaviour {
         // Retrieve the list of all player character objects, and add the script component
         // PlayerScript.cs to each player.
         playerList = new List<GameObject>() {  GameObject.Find("Player1"), GameObject.Find("Player2") };
-        foreach (GameObject player in playerList) {
-            if (player.GetComponent<PlayerScript>() == null) {
-                player.AddComponent<PlayerScript>();
-            }
-            player.GetComponent<PlayerScript>().PreStart();
-        }
 
-        #if UNITY_EDITOR
+
         // If the namespace UnityEditor is defined, update the values of the input axes if the flag is set to true (
         // do this in Global.cs).
-        if (Global.REDEFINE_INPUT_AXES) {
-            CONTROL_MANAGER = new ControlManager();
-            CONTROL_MANAGER.RedefineInputManager();
-        }
+        #if UNITY_EDITOR
+            if (Global.REDEFINE_INPUT_AXES) {
+                CONTROL_MANAGER = new ControlManager();
+                CONTROL_MANAGER.RedefineInputManager();
+            }
         #endif
+
+        // Get a list of all the consoles and controls plugged in.
+        string[] joystickList = Input.GetJoystickNames();
+        int numJoysticks = joystickList.Length;
+		int numJoysticksAssigned = Math.Min (2, numJoysticks);
+		for (int i = 0; i < numJoysticksAssigned; i++) {
+			if (playerList[i].GetComponent<PlayerScript>() == null) {
+				playerList[i].AddComponent<PlayerScript>();
+			}
+			playerList[i].GetComponent<PlayerScript>().PreStart(i + 1);
+		}
+
 	}
 	
 	// Update the match every frame.
