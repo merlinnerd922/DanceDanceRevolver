@@ -24,9 +24,9 @@ public class MatchManager : MonoBehaviour
 
     // Exclusive to Unity testing environments only. If run as the executable itself and not in the Unity window,
     // this assignment will be ignored. This variable manages the mapping of controls.
-#if UNITY_EDITOR
-    ControlManager CONTROL_MANAGER;
-#endif
+    #if UNITY_EDITOR
+        ControlManager CONTROL_MANAGER;
+    #endif
 
     // Load the match screen.
     void Start()
@@ -54,12 +54,12 @@ public class MatchManager : MonoBehaviour
 
         // If the namespace UnityEditor is defined, update the values of the input axes if the flag is set to true (
         // do this in Global.cs).
-#if UNITY_EDITOR
-        if (Global.REDEFINE_INPUT_AXES) {
-            CONTROL_MANAGER = new ControlManager();
-            CONTROL_MANAGER.RedefineInputManager();
-        }
-#endif
+        #if UNITY_EDITOR
+            if (Global.REDEFINE_INPUT_AXES) {
+                CONTROL_MANAGER = new ControlManager();
+                CONTROL_MANAGER.RedefineInputManager();
+            }
+        #endif
 
         // Get a list of all the consoles and controls plugged in.
         string[] joystickList = Input.GetJoystickNames();

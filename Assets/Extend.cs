@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 // A namespace (and by extension, a class) containing several extension methods.
 namespace ExtendSpace
