@@ -1,46 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#if UNITY_EDITOR
 using ExtendSpace;
-
-#if UNITY_EDITOR
-    using UnityEditor;
-#endif
-
-// An enumeration of different axes types: is it a mouse movement, a key/mouse button press, or a joystick movement?
-public enum AxisType
-{
-    KeyOrMouseButton = 0,
-    MouseMovement = 1,
-    JoystickAxis = 2
-};
-
-// An enumeration of all the different axes of control on a PS4 controller.
-public enum PS4Control
-{
-    VERTICAL,
-    HORIZONTAL,
-    TRIANGLE,
-    SQUARE,
-    X,
-    CIRCLE,
-    L1,
-    L2,
-    R1,
-    R2,
-    HORIZONTAL_LEFT_STICK,
-    HORIZONTAL_RIGHT_STICK,
-    VERTICAL_LEFT_STICK,
-    VERTICAL_RIGHT_STICK
-}
+using System;
+using System.Collections.Generic;
+using UnityEditor;
 
 // A class that manages the input and controls of the game.
-#if UNITY_EDITOR
 class ControlManager
 {
     public Dictionary<PS4Control, int?> controlAxisMapping; // A mapping of PS4 controls to certain axes.
     public Dictionary<PS4Control, int?> controlButtonMapping; // A mapping of PS4 controls to certain buttons.
-    private float controlSensitivity;
-
+    
     public ControlManager()
     {
         // Initialize mappings of PS4 controls to axes and buttons.
@@ -133,14 +102,12 @@ class ControlManager
         serializedObject.ApplyModifiedProperties();
 
     }
-
-
     // Reset the game's input axes to the given values.
     public void RedefineInputManager()
     {
         int controlAxis, controlButton, controlGravity;
-
         string joystickButtonText;
+        float controlSensitivity;
 
         // Clear out the set of input definitions.
         SerializedObject serializedObject = new SerializedObject(AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/InputManager.asset")[0]);
@@ -148,8 +115,7 @@ class ControlManager
         axesProperty.ClearArray();
         serializedObject.ApplyModifiedProperties();
 
-
-        // For each player, define different input axes.
+        // For each player, define all of the different input axes.
         for (int j = 0; j < 1; j++) {
             foreach (PS4Control psc in Enum.GetValues(typeof(PS4Control))) {
 
@@ -173,32 +139,10 @@ class ControlManager
             }
         }
 
-        AssetDatabase.SaveAssets(); // Save info
+        // Save all info on the new input axes to the input manager
+        AssetDatabase.SaveAssets(); 
 
     }
 
 }
 #endif
-
-public class InputAxis
-{
-    public string name;
-    public string descriptiveName;
-    public string descriptiveNegativeName;
-    public string negativeButton;
-    public string positiveButton;
-    public string altNegativeButton;
-    public string altPositiveButton;
-
-    public float gravity;
-    public float dead;
-    public float sensitivity;
-
-    public bool snap = false;
-    public bool invert = false;
-
-    public AxisType type;
-
-    public int axis;
-    public int joyNum;
-}

@@ -16,6 +16,7 @@ public class Helper
         return (float)result;
     }
 
+    // Given a player number and a control, return the axis (as a string) associated with them.
     public static string GetPlayerAxis(int playerNum, PS4Control c)
     {
         return "Player" + playerNum.ToString() + c;
