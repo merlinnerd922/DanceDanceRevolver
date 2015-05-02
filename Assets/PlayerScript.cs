@@ -29,7 +29,7 @@ public class PlayerScript : MonoBehaviour
     {
         float inputVal;
         bool inputBoolVal;
-        
+
         foreach (PS4Control c in Enum.GetValues(typeof(PS4Control))) {
 
             if (c.IsButton()) {
@@ -46,64 +46,27 @@ public class PlayerScript : MonoBehaviour
                         stringRepOnScreen = c.ToString();
                     }
 
+                    else if (Math.Abs(inputVal) > 0.5f) {
 
-                    if (c == PS4Control.HORIZONTAL_LEFT_STICK) {
-                        stringRepOnScreen = c.ToString();
+                        if (c == PS4Control.VERTICAL_LEFT_STICK) {
+                            if (Math.Abs(inputVal) > Math.Abs(Input.GetAxis(Helper.GetPlayerAxis(playerNum, PS4Control.HORIZONTAL_LEFT_STICK)))) {
+                                stringRepOnScreen = c.ToString();
+                                break;
+                            }
+                        }
+
+                        else if (c == PS4Control.HORIZONTAL_LEFT_STICK) {
+                            if (Math.Abs(inputVal) > Math.Abs(Input.GetAxis(Helper.GetPlayerAxis(playerNum, PS4Control.VERTICAL_LEFT_STICK)))) {
+                                stringRepOnScreen = c.ToString();
+                                break;
+                            }
+                        }
+
                     }
-
-                    //else if (c.IsAny(PS4Control.HORIZONTAL_LEFT_STICK, PS4Control.HORIZONTAL_RIGHT_STICK)) {
-                    //    stringRepOnScreen = c.ToString();
-                    //}
-                    //else if (Math.Abs(inputVal) > 0.5f) {
-                    //    if (c == PS4Control.HORIZONTAL_LEFT_STICK) {
-                    //        stringRepOnScreen = c.ToString();
-                    //    }
-
-                    //    else if (c == PS4Control.HORIZONTAL_RIGHT_STICK) {
-                    //        stringRepOnScreen = c.ToString();
-                    //    }
-
-                    //    else if (c == PS4Control.VERTICAL_LEFT_STICK) {
-                    //        stringRepOnScreen = c.ToString();
-                    //    }
-
-                    //    else if (c == PS4Control.VERTICAL_RIGHT_STICK) {
-                    //        stringRepOnScreen = c.ToString();
-                    //    }
-                    //}
-
-
-
-                    
-
                 }
+
             }
-
-
-            
-
-        //    x = Input.GetAxis(Helper.GetPlayerAxis(playerNum, c));
-
-        //    if (c.IsAny(PS4Control.L2, PS4Control.R2)) 
-        //    {
-        //        if (Math.Abs(x) > 0.05f && x != -1f) 
-        //        {
-        //            stringRepOnScreen = c.ToString();
-        //        }
-        //    }
-
-        //    else if (Math.Abs(x) > 0.05f) {
-        //        stringRepOnScreen = c.ToString();
-        //    }
-
         }
-
-
-       
-         
-        
-
-
     }
 
     void OnGUI()

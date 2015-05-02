@@ -2,16 +2,16 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\ControlManager.cs">
     <Files>
-      <File FileName="Assets\MatchManager.cs" Line="66" Column="1" />
-      <File FileName="Assets\PlayerScript.cs" Line="49" Column="3" />
-      <File FileName="Assets\Helper.cs" Line="13" Column="45" />
-      <File FileName="Assets\ControlManager.cs" Line="100" Column="3" />
+      <File FileName="Assets\MatchManager.cs" Line="74" Column="1" />
+      <File FileName="Assets\PlayerScript.cs" Line="20" Column="36" />
+      <File FileName="Assets\Helper.cs" Line="24" Column="1" />
+      <File FileName="Assets\ControlManager.cs" Line="150" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\PlayerScript.cs" line="44" />
-      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\PlayerScript.cs" line="38" />
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\PlayerScript.cs" line="45" />
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\PlayerScript.cs" line="40" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
