@@ -40,18 +40,23 @@ public class Player : MonoBehaviour
     // Mappings between player number and location of where to draw the number of HP left.
     public List<Rect> locationToDrawHPRemaining = new List<Rect>() {
         new Rect(50f, 50f, 50f, 50f),
-        new Rect(Screen.width - 100f - 200f, Screen.height - 100f, 50f, 50f)
+        new Rect(Screen.width - 100f - 200f, Screen.height - 100f, 100f, 50f)
     };
 
     // Location of where to display all 3 - 5 symbols to press.
     public List<Rect> locationToDrawSymbolSequence = new List<Rect>() {
         new Rect(50f, 100f, 50f, 50f),
-        new Rect(Screen.width - 100f - 200f - 50f, Screen.height - 100f - 50f, 50f + 50f, 50f)
+        new Rect(Screen.width - 100f - 250f, Screen.height - 150f, 100f, 50f)
     };
 
     public List<Rect> locationToDrawStatusMessage = new List<Rect>() {
         new Rect(50f, 150f, 50f, 50f),
-        new Rect(Screen.width - 100f - 200f , Screen.height - 100f - 100f, 100f, 50f)
+        new Rect(Screen.width - 100f - 200f , Screen.height - 200f, 100f, 50f)
+    };
+
+    public List<Rect> locationToDrawDodgesLeft = new List<Rect>() {
+        new Rect(50f, 200f, 50f, 50f),
+        new Rect(Screen.width - 100f - 300f , Screen.height - 250f, 100f, 50f)
     };
 
     public static Dictionary<PS4Pressable, string> pressableCharacterSymbolMapping = new Dictionary<PS4Pressable, string>() {
@@ -71,6 +76,7 @@ public class Player : MonoBehaviour
     public Texture clashGraphic;
     private Texture hitGraphic;
     public bool isDodging;
+    private Texture dodgeGraphic;
 
     // Call this special method to load characteristics associated with this player.
     public void PreStart(int _playerNum)
@@ -114,6 +120,7 @@ public class Player : MonoBehaviour
 
         clashGraphic = Resources.Load<Texture>("DuelloIcons/clash");
         hitGraphic = Resources.Load<Texture>("DuelloIcons/hit");
+        dodgeGraphic = Resources.Load<Texture>("DuelloIcons/dodge");
 
         isDodging = false;
 
@@ -196,14 +203,13 @@ public class Player : MonoBehaviour
                             isDodging = true;
                         }
 
-
                     }
                 }
 
             }
 
             // For buttons, check to see if they've been pressed, and if so, update the most recently pressed control.
-            if (c.IsButton()) {
+            else if (c.IsButton()) {
 
                 inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
                 if (inputBoolVal) {
@@ -399,15 +405,19 @@ public class Player : MonoBehaviour
         else if (mostRecentStatusMessage == "HIT!") {
             GUI.DrawTexture(locationToDrawStatusMessage[playerNum - 1], hitGraphic, ScaleMode.StretchToFill, true);
         }
-        else {    
+        else if (mostRecentStatusMessage == "DODGE!") {
+            GUI.DrawTexture(locationToDrawStatusMessage[playerNum - 1], dodgeGraphic, ScaleMode.StretchToFill, true);
+        }
+
+        else {
             GUI.Label(locationToDrawStatusMessage[playerNum - 1], mostRecentStatusMessage, controlDisplayStyle);
         }
 
         // Display the message displaying the current sequence of symbols to select.
         GUI.Label(locationToDrawSymbolSequence[playerNum - 1], currentActiveKeySequence.ToOnScreenRep(numSymbolsPressed), controlDisplayStyle);
 
-
-        // Display the number of dodges
+        // Display the number of dodges on screen.
+        GUI.Label(locationToDrawDodgesLeft[playerNum - 1], String.Format("Dodges left: {0}", dodgesLeft), controlDisplayStyle);
     }
 
 

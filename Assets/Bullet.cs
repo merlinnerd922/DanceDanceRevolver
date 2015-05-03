@@ -36,8 +36,6 @@ public class Bullet : MonoBehaviour
         shouldFire = true;
     }
 
-
-
     internal void PreStart()
     {
         // Set the start time of the bullet:

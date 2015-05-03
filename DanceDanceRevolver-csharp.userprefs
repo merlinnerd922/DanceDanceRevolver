@@ -1,11 +1,15 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Helper.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Player.cs">
     <Files>
-      <File FileName="Assets\MatchManager.cs" Line="112" Column="1" />
-      <File FileName="Assets\Helper.cs" Line="22" Column="2" />
+      <File FileName="Assets\MatchManager.cs" Line="257" Column="1" />
+      <File FileName="Assets\Helper.cs" Line="41" Column="49" />
       <File FileName="Assets\ControlManager.cs" Line="155" Column="1" />
-      <File FileName="Assets\Bullet.cs" Line="38" Column="1" />
+      <File FileName="Assets\Bullet.cs" Line="12" Column="21" />
+      <File FileName="Assets\ControlClasses.cs" Line="17" Column="12" />
+      <File FileName="Assets\Extend.cs" Line="1" Column="1" />
+      <File FileName="Assets\Global.cs" Line="1" Column="1" />
+      <File FileName="Assets\Player.cs" Line="207" Column="18" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
@@ -21,9 +25,9 @@
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
       <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\PlayerScript.cs" line="209" />
-      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Bullet.cs" line="38" />
-      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Bullet.cs" line="44" />
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Bullet.cs" line="42" />
       <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Bullet.cs" line="19" />
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Player.cs" line="198" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

@@ -64,10 +64,10 @@ public class MatchManager : MonoBehaviour
         // If the namespace UnityEditor is defined, update the values of the input axes if the flag is set to true (
         // do this in Global.cs).
         #if UNITY_EDITOR
-                if (Global.REDEFINE_INPUT_AXES) {
-                    CONTROL_MANAGER = new ControlManager();
-                    CONTROL_MANAGER.RedefineInputManager();
-                }
+            if (Global.REDEFINE_INPUT_AXES) {
+                CONTROL_MANAGER = new ControlManager();
+                CONTROL_MANAGER.RedefineInputManager();
+            }
         #endif
 
         // Get a list of all the consoles and controls plugged in.
@@ -102,9 +102,6 @@ public class MatchManager : MonoBehaviour
         }
 
     }
-
-
-
 
     // Update the match every frame.
     void Update()
@@ -153,12 +150,14 @@ public class MatchManager : MonoBehaviour
                 playerScripts[0].queuedShots.Dequeue();
 
                 if (!playerScripts[0].isDodging) {
-                    playerScripts[1].DecrementHP(0);
+                    playerScripts[1].DecrementHP(1);
                     playerScripts[1].mostRecentStatusMessage = "OUCH!";
                     playerScripts[0].mostRecentStatusMessage = "HIT!";
                 }
                 else {
                     playerScripts[0].isDodging = false;
+                    playerScripts[1].mostRecentStatusMessage = "DODGE!";
+                    playerScripts[0].mostRecentStatusMessage = "MISSED!";
                 }
             }
 
@@ -174,6 +173,9 @@ public class MatchManager : MonoBehaviour
                 }
                 else {
                     playerScripts[1].isDodging = false;
+                    playerScripts[0].mostRecentStatusMessage = "DODGE!";
+                    playerScripts[1].mostRecentStatusMessage = "MISSED!";
+
                 }
 
             }
@@ -209,12 +211,14 @@ public class MatchManager : MonoBehaviour
                     playerScripts[0].queuedShots.Dequeue();
 
                     if (!playerScripts[0].isDodging) {
-                        playerScripts[1].DecrementHP(0);
+                        playerScripts[1].DecrementHP(1);
                         playerScripts[1].mostRecentStatusMessage = "OUCH!";
                         playerScripts[0].mostRecentStatusMessage = "HIT!";
                     }
                     else {
                         playerScripts[0].isDodging = false;
+                        playerScripts[1].mostRecentStatusMessage = "DODGE!";
+                        playerScripts[0].mostRecentStatusMessage = "MISSED!";
                     }
                 }
 

@@ -5,7 +5,7 @@ public static class Global
 {
     public static Font STENCIL = Resources.Load<Font>("STENCIL"); // Stencil font-face
     public static bool REDEFINE_INPUT_AXES = true; // Indicate whether we should update the input manager.
-    public static bool TEST_MODE = false;
+    public static bool TEST_MODE = true;
 
     public static int NUM_PLAYERS = 2;
 }
