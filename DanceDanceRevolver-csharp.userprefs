@@ -1,15 +1,30 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\PlayerScript.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Helper.cs">
     <Files>
-      <File FileName="Assets\MatchManager.cs" Line="131" Column="1" />
-      <File FileName="Assets\PlayerScript.cs" Line="64" Column="7" />
-      <File FileName="Assets\Helper.cs" Line="24" Column="1" />
-      <File FileName="Assets\ControlManager.cs" Line="198" Column="3" />
+      <File FileName="Assets\MatchManager.cs" Line="112" Column="1" />
+      <File FileName="Assets\Helper.cs" Line="22" Column="2" />
+      <File FileName="Assets\ControlManager.cs" Line="155" Column="1" />
+      <File FileName="Assets\Bullet.cs" Line="38" Column="1" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.Debugger.WatchPad">
+        <State>
+          <Value>currentActiveKeySequence[numSymbolsPressed</Value>
+          <Value>c.ToPS4Pressable()</Value>
+          <Value>numSymbolsPressed</Value>
+          <Value>currentActiveKeySequence.Count -1</Value>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore />
+    <BreakpointStore>
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\PlayerScript.cs" line="209" />
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Bullet.cs" line="38" />
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Bullet.cs" line="44" />
+      <Breakpoint file="C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Assets\Bullet.cs" line="19" />
+    </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
 </Properties>

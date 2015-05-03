@@ -33,6 +33,8 @@ class ControlManager
             { PS4Control.R1, 5},
             { PS4Control.L2, 6},
             { PS4Control.R2, 7},
+            { PS4Control.L3, 10},
+            { PS4Control.R3, 11},
             { PS4Control.VERTICAL, 13},
             { PS4Control.HORIZONTAL, 13}
         };
@@ -106,6 +108,7 @@ class ControlManager
     public void RedefineInputManager()
     {
         int controlAxis, controlButton, controlGravity;
+        AxisType controlType;
         string joystickButtonText;
         float controlSensitivity;
 
@@ -116,20 +119,25 @@ class ControlManager
         serializedObject.ApplyModifiedProperties();
 
         // For each player, define all of the different input axes.
-        for (int j = 0; j < 1; j++) {
+        for (int j = 0; j < 2; j++) {
             foreach (PS4Control psc in Enum.GetValues(typeof(PS4Control))) {
 
                 controlAxis = controlAxisMapping.ContainsKey(psc) ? (int)controlAxisMapping[psc] : 1;
                 controlButton = controlButtonMapping.ContainsKey(psc) ? (int)controlButtonMapping[psc] : -1;
 
-                joystickButtonText = controlButton != -1 ? "joystick button " + controlButton : "";
+                joystickButtonText = controlButton != -1 ? "joystick " + (j + 1).ToString() + " button " + controlButton : "";
                 controlGravity = psc.IsButton() ? 1 : 1000;
                 controlSensitivity = psc.IsStick() ? 1f : 1000f;
+
+                if (psc == PS4Control.TRIANGLE && j == 1) {
+                    //controlType = AxisType.KeyOrMouseButton;
+                    //joystickButtonText = "a";
+                }
 
                 AddAxis(new InputAxis() {
                     name = Helper.GetPlayerAxis(j + 1, psc),
                     dead = 0.001f,
-                    type = AxisType.JoystickAxis,
+                    type = AxisType.KeyOrMouseButton,
                     axis = controlAxis,
                     joyNum = (j + 1),
                     positiveButton = joystickButtonText,

@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">
+  <asset>
+    <contributor>
+      <authoring_tool>Minddesk Qubicle 2</authoring_tool>
+      <comments>Get Qubicle at www.minddesk.com</comments>
+    </contributor>
+    <created>2015-05-0210:56 AM10:56:19:967</created>
+    <modified>2015-05-0210:56 AM10:56:19:967</modified>
+    <unit meter="0.01" />
+  </asset>
+  <library_images>
+    <image id="JOE-image" name="JOE-image">
+      <init_from>file:///Materials/JOE.png</init_from>
+    </image>
+  </library_images>
+  <library_materials>
+    <material id="JOE-material" name="JOE-material">
+      <instance_effect url="#JOE-shader-fx" />
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="JOE-shader-fx" name="JOE-shader-fx">
+      <profile_COMMON>
+        <newparam sid="JOE-image-surface">
+          <surface type="2D">
+            <init_from>JOE-image</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="JOE-image-sampler">
+          <sampler2D>
+            <source>JOE-image-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NEAREST</minfilter>
+            <magfilter>NEAREST</magfilter>
+          </sampler2D>
+        </newparam>
+        <technique sid="standard">
+          <lambert>
+            <ambient>
+              <color sid="ambient">0.0 0.0 0.0 1.0</color>
+            </ambient>
+            <diffuse>
+              <texture texcoord="CHANNEL0" texture="JOE-image-sampler" />
+            </diffuse>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry name="Matrix_53" id="Matrix_53-lib">
+      <mesh>
+        <source id="Matrix_53-position">
+          <float_array id="Matrix_53-position-array" count="24">10.0 0.5 -10.0 10.0 -0.5 -10.0 -10.0 -0.5 -10.0 -10.0 0.5 -10.0 -10.0 0.5 10.0 -10.0 -0.5 10.0 10.0 -0.5 10.0 10.0 0.5 10.0 </float_array>
+          <technique_common>
+            <accessor source="Matrix_53-position-array" stride="3" count="8">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Matrix_53-normal">
+          <float_array id="Matrix_53-normal-array" count="18">0.0 0.0 1.0 0.0 0.0 -1.0 -1.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 -1.0 0.0</float_array>
+          <technique_common>
+            <accessor source="Matrix_53-normal-array" stride="3" count="6">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Matrix_53-uv">
+          <float_array id="Matrix_53-uv-array" count="48">0.825562 0.247314 0.825562 0.169189 0.864624 0.169189 0.864624 0.247314 0.864868 0.247314 0.864868 0.169189 0.903931 0.169189 0.903931 0.247314 0.432495 0.62085 0.432495 0.616943 0.471558 0.616943 0.471558 0.62085 0.707642 0.62085 0.707642 0.616943 0.746704 0.616943 0.746704 0.62085 0.746948 0.62085 0.746948 0.616943 0.786011 0.616943 0.786011 0.62085 0.786255 0.62085 0.786255 0.616943 0.825317 0.616943 0.825317 0.62085 </float_array>
+          <technique_common>
+            <accessor source="Matrix_53-uv-array" stride="2" count="24">
+              <param name="S" type="float" />
+              <param name="T" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Matrix_53-vertex">
+          <input semantic="POSITION" source="#Matrix_53-position" />
+        </vertices>
+        <polylist material="JOE-material" count="6">
+          <input offset="0" semantic="VERTEX" source="#Matrix_53-vertex" />
+          <input offset="1" semantic="NORMAL" source="#Matrix_53-normal" />
+          <input offset="2" semantic="TEXCOORD" source="#Matrix_53-uv" />
+          <vcount>4 4 4 4 4 4 </vcount>
+          <p>0 1 12 1 1 13 2 1 14 3 1 15 4 0 16 5 0 17 6 0 18 7 0 19 3 2 20 2 2 21 5 2 22 4 2 23 7 3 8 6 3 9 1 3 10 0 3 11 3 4 0 4 4 1 7 4 2 0 4 3 5 5 4 2 5 5 1 5 6 6 5 7 </p>
+        </polylist>
+      </mesh>
+    </geometry>)
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="JOE-scene" name="JOE-scene">
+      <node sid="Matrix_53" id="Matrix_53" name="Matrix_53">
+        <translate sid="translate">168.00 93.50 0.00</translate>
+        <instance_geometry url="#Matrix_53-lib">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="JOE-material" target="#JOE-material" />
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene name="" sid="" url="#JOE-scene" />
+  </scene>
+</COLLADA>

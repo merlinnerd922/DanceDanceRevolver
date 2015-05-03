@@ -22,7 +22,32 @@ public enum PS4Control
     HORIZONTAL_LEFT_STICK,
     HORIZONTAL_RIGHT_STICK,
     VERTICAL_LEFT_STICK,
-    VERTICAL_RIGHT_STICK
+    VERTICAL_RIGHT_STICK,
+    L3,
+    R3
+}
+
+// An enumeration of all the different possible buttons to press on a PS4 controller.
+public enum PS4Pressable
+{
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN,
+    TRIANGLE,
+    SQUARE,
+    X,
+    CIRCLE,
+    L1,
+    L2,
+    R1,
+    R2,
+    HORIZONTAL_LEFT_STICK,
+    HORIZONTAL_RIGHT_STICK,
+    VERTICAL_LEFT_STICK,
+    VERTICAL_RIGHT_STICK,
+    L3,
+    R3
 }
 
 // A class representation of all characteristics of an input axis.

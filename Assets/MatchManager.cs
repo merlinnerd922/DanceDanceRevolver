@@ -17,10 +17,19 @@ public class MatchManager : MonoBehaviour
     float timerToWaitAfterDrawBeforeBattle; // Amount of time to wait, after the message "DRAW" has appeared, and before the battle starts.
 
     private bool displayGoMessage; // Indicates whether we should display the "GO!" message. 
-    private float timerToDisplayGoMessage; // Measures how the countdown over how long we should wait before displaying the "GO!" message.
+    private static float timerToDisplayGoMessage; // Measures how the countdown over how long we should wait before displaying the "GO!" message.
     private const float TIME_TO_DISPLAY_GO_MESSAGE = .5f; // Amount of time to display the "GO!" message.
 
     public List<GameObject> playerList; // A list of GameObjects representing both players.
+    public List<Player> playerScripts; // A list corresponding to the scripts of the player GameObjects.
+
+    public static bool matchHasBegun
+    {
+        get
+        {
+            return timerToDisplayGoMessage <= 0f;
+        }
+    }
 
     // Exclusive to Unity testing environments only. If run as the executable itself and not in the Unity window,
     // this assignment will be ignored. This variable manages the mapping of controls.
@@ -33,9 +42,9 @@ public class MatchManager : MonoBehaviour
     {
 
         // Set all the timers for doing stuff on-screen.
-        timerToWaitAfterDrawBeforeBattle = Helper.NextFloat(5f, 10f);
-        timerToDisplayGoMessage = TIME_TO_DISPLAY_GO_MESSAGE;
-        timerDisplayRules = TIME_DISPLAY_RULES;
+        timerToWaitAfterDrawBeforeBattle = Global.TEST_MODE ? 0f : Helper.NextFloat(5f, 10f);
+        timerToDisplayGoMessage = Global.TEST_MODE ? 0f : TIME_TO_DISPLAY_GO_MESSAGE;
+        timerDisplayRules = Global.TEST_MODE ? 0f : TIME_DISPLAY_RULES;
 
         // Don't display the messages for "GO!" or "DRAW!" at all, until time warrants it. 
         displayGoMessage = false;
@@ -55,30 +64,58 @@ public class MatchManager : MonoBehaviour
         // If the namespace UnityEditor is defined, update the values of the input axes if the flag is set to true (
         // do this in Global.cs).
         #if UNITY_EDITOR
-            if (Global.REDEFINE_INPUT_AXES) {
-                CONTROL_MANAGER = new ControlManager();
-                CONTROL_MANAGER.RedefineInputManager();
-            }
+                if (Global.REDEFINE_INPUT_AXES) {
+                    CONTROL_MANAGER = new ControlManager();
+                    CONTROL_MANAGER.RedefineInputManager();
+                }
         #endif
 
         // Get a list of all the consoles and controls plugged in.
         string[] joystickList = Input.GetJoystickNames();
         int numJoysticks = joystickList.Length;
-        int numJoysticksAssigned = Math.Min(2, numJoysticks);
+        int numJoysticksAssigned = Math.Min(2, 2);
 
-        for (int i = 0; i < numJoysticksAssigned; i++) {
+        for (int i = 0; i < 2; i++) {
             // Add the player script if it has not been added, and start it.
-            if (playerList[i].GetComponent<PlayerScript>() == null) {
-                playerList[i].AddComponent<PlayerScript>();
+            if (playerList[i].GetComponent<Player>() == null) {
+                playerList[i].AddComponent<Player>();
             }
-            playerList[i].GetComponent<PlayerScript>().PreStart(i + 1);
+            playerList[i].GetComponent<Player>().PreStart(i + 1);
+        }
+
+        // Generate a list of player scripts representing each of the players, and add
+        // the Player components to the list.
+        playerScripts = new List<Player>() { };
+        playerList.ForEach(x => playerScripts.Add(x.GetComponent<Player>()));
+
+        // Populate the sequence of keys to be pressed with 20 items.
+
+        for (int i = 0; i < 2; i++) {
+            playerScripts[i].symbolsToPress = new Queue<List<PS4Pressable>>();
+        }
+
+        for (int j = 0; j < 20; j++) {
+            List<PS4Pressable> sequenceToAdd = Helper.GetRandomListOfKeysToPress();
+            for (int i = 0; i < 2; i++) {
+                playerScripts[i].symbolsToPress.Enqueue(sequenceToAdd);
+            }
         }
 
     }
 
+
+
+
     // Update the match every frame.
     void Update()
     {
+        if (playerScripts[0].symbolsToPress.Count <= 5 || playerScripts[1].symbolsToPress.Count <= 5) {
+            for (int j = 0; j < 20; j++) {
+                List<PS4Pressable> symbolsToAdd = Helper.GetRandomListOfKeysToPress();
+                playerScripts[0].symbolsToPress.Enqueue(symbolsToAdd);
+                playerScripts[1].symbolsToPress.Enqueue(symbolsToAdd);
+            }
+        }
 
         // Display the rules on-screen.
         if (timerDisplayRules > 0f) {
@@ -103,6 +140,89 @@ public class MatchManager : MonoBehaviour
         }
         else {
             displayGoMessage = false;
+        }
+
+        // Once the timer to display the go message counts down, the game has begun!
+        if (timerToDisplayGoMessage <= 0f) {
+
+            bool player1FiredBullet = playerScripts[0].queuedShots.Count != 0;
+            bool player2FiredBullet = playerScripts[1].queuedShots.Count != 0;
+
+            // Player 1 fires a bullet and player 2 doesn't.
+            if (player1FiredBullet && !player2FiredBullet) {
+                playerScripts[0].queuedShots.Dequeue();
+
+                if (!playerScripts[0].isDodging) {
+                    playerScripts[1].DecrementHP(0);
+                    playerScripts[1].mostRecentStatusMessage = "OUCH!";
+                    playerScripts[0].mostRecentStatusMessage = "HIT!";
+                }
+                else {
+                    playerScripts[0].isDodging = false;
+                }
+            }
+
+            // Player 2 fires a bullet and player 1 doesn't.
+            else if (!player1FiredBullet && player2FiredBullet) {
+                
+                playerScripts[1].queuedShots.Dequeue();
+
+                if (!playerScripts[1].isDodging) {
+                    playerScripts[0].DecrementHP(1);
+                    playerScripts[0].mostRecentStatusMessage = "OUCH!";
+                    playerScripts[1].mostRecentStatusMessage = "HIT!";
+                }
+                else {
+                    playerScripts[1].isDodging = false;
+                }
+
+            }
+
+            else if (player1FiredBullet && player2FiredBullet) {
+                float player1Time = Math.Abs(playerScripts[0].queuedShots.Peek());
+                float player2Time = Math.Abs(playerScripts[1].queuedShots.Peek());
+
+                // Tied bullet strikes
+                if (Math.Abs(player1Time - player2Time) <= 0.05) {
+                    playerScripts[1].queuedShots.Dequeue();
+                    playerScripts[0].queuedShots.Dequeue();
+
+                    playerScripts[0].mostRecentStatusMessage = "BLOCKED!";
+                    playerScripts[1].mostRecentStatusMessage = "BLOCKED!";
+                }
+
+                // 
+                else if (player1Time > player2Time) {
+                    playerScripts[1].queuedShots.Dequeue();
+
+                    if (!playerScripts[1].isDodging) {
+                        playerScripts[0].DecrementHP(1);
+                        playerScripts[0].mostRecentStatusMessage = "OUCH!";
+                        playerScripts[1].mostRecentStatusMessage = "HIT!";
+                    }
+                    else {
+                        playerScripts[1].isDodging = false;
+                    }
+                }
+
+                else if (player2Time > player1Time) {
+                    playerScripts[0].queuedShots.Dequeue();
+
+                    if (!playerScripts[0].isDodging) {
+                        playerScripts[1].DecrementHP(0);
+                        playerScripts[1].mostRecentStatusMessage = "OUCH!";
+                        playerScripts[0].mostRecentStatusMessage = "HIT!";
+                    }
+                    else {
+                        playerScripts[0].isDodging = false;
+                    }
+                }
+
+            }
+
+            playerScripts[0].isDodging = false;
+            playerScripts[1].isDodging = false;
+
         }
 
     }

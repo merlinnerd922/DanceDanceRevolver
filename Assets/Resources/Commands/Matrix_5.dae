@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.4.0" xmlns="http://www.collada.org/2005/11/COLLADASchema">
+  <asset>
+    <contributor>
+      <authoring_tool>Minddesk Qubicle 2</authoring_tool>
+      <comments>Get Qubicle at www.minddesk.com</comments>
+    </contributor>
+    <created>2015-05-0210:56 AM10:56:05:791</created>
+    <modified>2015-05-0210:56 AM10:56:05:791</modified>
+    <unit meter="0.01" />
+  </asset>
+  <library_images>
+    <image id="JOE-image" name="JOE-image">
+      <init_from>file:///Materials/JOE.png</init_from>
+    </image>
+  </library_images>
+  <library_materials>
+    <material id="JOE-material" name="JOE-material">
+      <instance_effect url="#JOE-shader-fx" />
+    </material>
+  </library_materials>
+  <library_effects>
+    <effect id="JOE-shader-fx" name="JOE-shader-fx">
+      <profile_COMMON>
+        <newparam sid="JOE-image-surface">
+          <surface type="2D">
+            <init_from>JOE-image</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="JOE-image-sampler">
+          <sampler2D>
+            <source>JOE-image-surface</source>
+            <wrap_s>WRAP</wrap_s>
+            <wrap_t>WRAP</wrap_t>
+            <minfilter>NEAREST</minfilter>
+            <magfilter>NEAREST</magfilter>
+          </sampler2D>
+        </newparam>
+        <technique sid="standard">
+          <lambert>
+            <ambient>
+              <color sid="ambient">0.0 0.0 0.0 1.0</color>
+            </ambient>
+            <diffuse>
+              <texture texcoord="CHANNEL0" texture="JOE-image-sampler" />
+            </diffuse>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_geometries>
+    <geometry name="Matrix_5" id="Matrix_5-lib">
+      <mesh>
+        <source id="Matrix_5-position">
+          <float_array id="Matrix_5-position-array" count="108">-3.5 4.5 -0.5 -3.5 -4.5 -0.5 -4.5 -4.5 -0.5 -4.5 4.5 -0.5 3.5 3.5 -0.5 3.5 -3.5 -0.5 2.5 -3.5 -0.5 2.5 3.5 -0.5 -0.5 -3.5 -0.5 -0.5 -4.5 -0.5 -3.5 -3.5 -0.5 4.5 -3.5 -0.5 4.5 -4.5 -0.5 1.5 -4.5 -0.5 1.5 -3.5 -0.5 3.5 4.5 -0.5 1.5 3.5 -0.5 1.5 4.5 -0.5 -4.5 4.5 0.5 -4.5 -4.5 0.5 -3.5 -4.5 0.5 -3.5 4.5 0.5 2.5 3.5 0.5 2.5 -3.5 0.5 3.5 -3.5 0.5 3.5 3.5 0.5 -3.5 -3.5 0.5 -0.5 -4.5 0.5 -0.5 -3.5 0.5 1.5 -3.5 0.5 1.5 -4.5 0.5 4.5 -4.5 0.5 4.5 -3.5 0.5 1.5 4.5 0.5 1.5 3.5 0.5 3.5 4.5 0.5 </float_array>
+          <technique_common>
+            <accessor source="Matrix_5-position-array" stride="3" count="36">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Matrix_5-normal">
+          <float_array id="Matrix_5-normal-array" count="18">0.0 0.0 1.0 0.0 0.0 -1.0 -1.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 -1.0 0.0</float_array>
+          <technique_common>
+            <accessor source="Matrix_5-normal-array" stride="3" count="6">
+              <param name="X" type="float" />
+              <param name="Y" type="float" />
+              <param name="Z" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Matrix_5-uv">
+          <float_array id="Matrix_5-uv-array" count="208">0.760376 0.519287 0.760376 0.484131 0.762329 0.484131 0.762329 0.519287 0.764771 0.519287 0.764771 0.484131 0.766724 0.484131 0.766724 0.519287 0.769165 0.519287 0.769165 0.484131 0.771118 0.484131 0.771118 0.519287 0.418579 0.551025 0.418579 0.519775 0.420532 0.519775 0.420532 0.551025 0.422974 0.551025 0.422974 0.519775 0.424927 0.519775 0.424927 0.551025 0.523804 0.547119 0.523804 0.519775 0.525757 0.519775 0.525757 0.547119 0.530396 0.547119 0.530396 0.519775 0.532349 0.519775 0.532349 0.547119 0.532593 0.547119 0.532593 0.519775 0.534546 0.519775 0.534546 0.547119 0.837036 0.656006 0.837036 0.6521 0.844849 0.6521 0.844849 0.656006 0.946167 0.6604 0.946167 0.656494 0.952026 0.656494 0.952026 0.6604 0.982788 0.6604 0.982788 0.656494 0.988647 0.656494 0.988647 0.6604 0.988892 0.6604 0.988892 0.656494 0.994751 0.656494 0.994751 0.6604 0.000122 0.664795 0.000122 0.660889 0.005981 0.660889 0.005981 0.664795 0.006226 0.664795 0.006226 0.660889 0.012085 0.660889 0.012085 0.664795 0.024536 0.664795 0.024536 0.660889 0.030396 0.660889 0.030396 0.664795 0.091919 0.664795 0.091919 0.660889 0.095825 0.660889 0.095825 0.664795 0.386597 0.664795 0.386597 0.660889 0.390503 0.660889 0.390503 0.664795 0.407349 0.664795 0.407349 0.660889 0.411255 0.660889 0.411255 0.664795 0.55603 0.677979 0.55603 0.674072 0.557983 0.674072 0.557983 0.677979 0.569214 0.677979 0.569214 0.674072 0.571167 0.674072 0.571167 0.677979 0.575806 0.677979 0.575806 0.674072 0.577759 0.674072 0.577759 0.677979 0.578003 0.677979 0.578003 0.674072 0.579956 0.674072 0.579956 0.677979 0.584595 0.677979 0.584595 0.674072 0.586548 0.674072 0.586548 0.677979 0.586792 0.677979 0.586792 0.674072 0.588745 0.674072 0.588745 0.677979 0.679077 0.677979 0.679077 0.674072 0.68103 0.674072 0.68103 0.677979 0.681274 0.677979 0.681274 0.674072 0.683228 0.674072 0.683228 0.677979 </float_array>
+          <technique_common>
+            <accessor source="Matrix_5-uv-array" stride="2" count="104">
+              <param name="S" type="float" />
+              <param name="T" type="float" />
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Matrix_5-vertex">
+          <input semantic="POSITION" source="#Matrix_5-position" />
+        </vertices>
+        <polylist material="JOE-material" count="26">
+          <input offset="0" semantic="VERTEX" source="#Matrix_5-vertex" />
+          <input offset="1" semantic="NORMAL" source="#Matrix_5-normal" />
+          <input offset="2" semantic="TEXCOORD" source="#Matrix_5-uv" />
+          <vcount>4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 </vcount>
+          <p>0 1 0 1 1 1 2 1 2 3 1 3 4 1 20 5 1 21 6 1 22 7 1 23 8 1 40 9 1 41 1 1 42 10 1 43 11 1 48 12 1 49 13 1 50 14 1 51 15 1 60 4 1 61 16 1 62 17 1 63 18 0 4 19 0 5 20 0 6 21 0 7 22 0 28 23 0 29 24 0 30 25 0 31 26 0 56 20 0 57 27 0 58 28 0 59 29 0 36 30 0 37 31 0 38 32 0 39 33 0 64 34 0 65 25 0 66 35 0 67 3 2 8 2 2 9 19 2 10 18 2 11 7 2 24 6 2 25 23 2 26 22 2 27 14 2 72 13 2 73 30 2 74 29 2 75 17 2 76 16 2 77 34 2 78 33 2 79 21 3 16 26 3 17 10 3 18 0 3 19 35 3 12 24 3 13 5 3 14 15 3 15 28 3 92 27 3 93 9 3 94 8 3 95 32 3 88 31 3 89 12 3 90 11 3 91 10 4 44 26 4 45 28 4 46 8 4 47 17 4 68 33 4 69 35 4 70 15 4 71 3 4 84 18 4 85 21 4 86 0 4 87 14 4 80 29 4 81 23 4 82 6 4 83 5 4 96 24 4 97 32 4 98 11 4 99 19 5 32 2 5 33 9 5 34 27 5 35 30 5 52 13 5 53 12 5 54 31 5 55 34 5 100 16 5 101 7 5 102 22 5 103 </p>
+        </polylist>
+      </mesh>
+    </geometry>)
+  </library_geometries>
+  <library_visual_scenes>
+    <visual_scene id="JOE-scene" name="JOE-scene">
+      <node sid="Matrix_5" id="Matrix_5" name="Matrix_5">
+        <translate sid="translate">-124.50 75.50 0.50</translate>
+        <instance_geometry url="#Matrix_5-lib">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="JOE-material" target="#JOE-material" />
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene name="" sid="" url="#JOE-scene" />
+  </scene>
+</COLLADA>
