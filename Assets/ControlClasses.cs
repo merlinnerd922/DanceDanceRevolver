@@ -27,7 +27,7 @@ public enum PS4Control
     R3
 }
 
-// An enumeration of all the different possible buttons to press on a PS4 controller.
+// An enumeration of all the different possible buttons (which we call "pressables") to press on a PS4 controller.
 public enum PS4Pressable
 {
     LEFT,

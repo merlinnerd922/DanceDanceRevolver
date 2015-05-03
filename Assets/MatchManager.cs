@@ -22,6 +22,8 @@ public class MatchManager : MonoBehaviour
     public List<GameObject> playerList; // A list of GameObjects representing both players.
     public List<Player> playerScripts; // A list corresponding to the scripts of the player GameObjects.
 
+    // Indicates whether the match has begun (we determine this by determining whether we have displayed
+    // the message to begin shooting for the appropriate amount of time).
     public static bool matchHasBegun
     {
         get
@@ -32,12 +34,12 @@ public class MatchManager : MonoBehaviour
 
     // Exclusive to Unity testing environments only. If run as the executable itself and not in the Unity window,
     // this assignment will be ignored. This variable manages the mapping of controls.
-#if UNITY_EDITOR
-    ControlManager CONTROL_MANAGER;
-#endif
+    #if UNITY_EDITOR
+        ControlManager CONTROL_MANAGER;
+    #endif
 
-    public static Camera mainCamera;
-    private GameVictoryStatus gameVictoryStatus;
+    public static Camera mainCamera; // A game object representing the main camera.
+    private GameVictoryStatus gameVictoryStatus; // An object describing how the game ended: a victory for one player, or a tie?
     private string finalVictoryMessage;
     private GUIStyle gameEndsMessageStyle;
 

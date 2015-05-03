@@ -28,7 +28,7 @@ namespace ExtendSpace
                 PS4Pressable.L2, PS4Pressable.R1, PS4Pressable.R2, PS4Pressable.L3, PS4Pressable.R3);
         }
 
-        // Return true if the given control is a stick, and false otherwise.
+        // Return true if the given control is a left or right stick, and false otherwise.
         public static bool IsStick(this PS4Control psc)
         {
             return psc.IsAny(PS4Control.VERTICAL_LEFT_STICK, PS4Control.VERTICAL_RIGHT_STICK,
@@ -42,45 +42,62 @@ namespace ExtendSpace
             return lst[Helper.Next(0, lst.Count())];
         }
 
+        // Given a list interface of items, return a random item from the List.
+        public static T GetRandomItem<T>(this T[] lst)
+        {
+            return lst[Helper.Next(0, lst.Count())];
+        }
 
+        // Given a list of items, select <numItems> number of items from the list and return them as a list.
         public static List<T> GetNRandomItems<T>(this List<T> itemLists, int numItems)
         {
-            List<T> returnLst = new List<T>() { };
-
+            List<T> returnLst = new List<T>() {
+            };
             for (int i = 0; i < numItems; i++) {
                 returnLst.Add(itemLists.GetRandomItem());
             }
-
             return returnLst;
         }
 
+        // Given a string representing a seqeunce of symbols to be pressed, return a string representation of the sequence
+        // (based on how many symbols the user has already pressed).
         public static string ToOnScreenRep(this List<PS4Pressable> listPressables, int numSymbolsPressed)
         {
-            int numSymbolsPressedTemp = numSymbolsPressed; 
-
+            // Keep track of how many buttons have been pressed; decrement this variable in the loop below
+            // for each variable that has already been pressed. 
+            int numSymbolsPressedTemp = numSymbolsPressed;
             string returnStr = "";
+
             foreach (PS4Pressable p in listPressables) {
+
+                // This button has not already been pressed, so include it in the sequence.
                 if (numSymbolsPressedTemp <= 0) {
                     returnStr += Player.pressableCharacterSymbolMapping[p] + " ";
                 }
+
                 else {
                     numSymbolsPressedTemp--;
                 }
             }
+
             return returnStr;
         }
 
+        // Given a PS4 control, convert it to a possible button (input) to be pressed.
         public static PS4Pressable ToPS4Pressable(this PS4Control c)
         {
             return Helper.controlPressableMapping[c];
         }
 
-        public static Rect AddToX(this Rect r, float addValToX) {
+        // Given a rectangle <r>, return a version of the rectangle translated by <addValToX> units.
+        public static Rect AddToX(this Rect r, float addValToX)
+        {
             Rect returnRect = new Rect(r.xMin, r.yMin, r.width, r.height);
             returnRect.x += addValToX;
             return returnRect;
         }
 
+        // Given a quaternion <q1>, convert it to a Vector3.
         public static Vector3 ToVector3(this Quaternion q1)
         {
             float sqw = q1.w * q1.w;
