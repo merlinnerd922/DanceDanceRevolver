@@ -1,0 +1,12 @@
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\Assembly-CSharp-firstpass.pdb
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\UnityEditor.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\UnityEngine.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\UnityEngine.UI.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\nunit.framework.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\obj\Debug\Assembly-CSharp-firstpass.csprojResolveAssemblyReference.cache
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\obj\Debug\Assembly-CSharp-firstpass.dll
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\obj\Debug\Assembly-CSharp-firstpass.pdb

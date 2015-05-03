@@ -1,13 +1,18 @@
-﻿using System;
+﻿using ExtendSpace;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ExtendSpace;
+using UnityEngine;
+using UnityColor = UnityEngine.Color;
+using SysRandom = System.Random;
 
 // A class consisting of a bunch of helper functions.
 public class Helper
 {
+
+
     // A static instance of the Random class to functions based on probability.
-    public static Random randomModule = new Random();
+    public static SysRandom randomModule = new SysRandom();
 
     public static List<PS4Control> PS4Controls = Enum.GetValues(typeof(PS4Control)).Cast<PS4Control>().ToList();
 
@@ -21,6 +26,7 @@ public class Helper
 
     public static Dictionary<PS4Control, PS4Pressable> controlPressableMapping = PS4Buttons.ToDictionary(i => i, i => (PS4Pressable)(Enum.Parse(typeof(PS4Pressable), i.ToString())));
 
+    public static UnityColor DARK_RED = new UnityColor(139f / 255f, 0f, 0f);
 
     // Return a random float between <minVal> and <maxVal>.
     public static float NextFloat(float minVal, float maxVal)
@@ -45,6 +51,25 @@ public class Helper
     public static int Next(int minValue, int maxValue)
     {
         return randomModule.Next(minValue, maxValue);
+    }
+
+
+
+    public static Vector3 NormalizeAngles(Vector3 angles)
+    {
+        angles.x = NormalizeAngle(angles.x);
+        angles.y = NormalizeAngle(angles.y);
+        angles.z = NormalizeAngle(angles.z);
+        return angles;
+    }
+
+    static float NormalizeAngle(float angle)
+    {
+        while (angle > 360)
+            angle -= 360;
+        while (angle < 0)
+            angle += 360;
+        return angle;
     }
 
 }

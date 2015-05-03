@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
     // INFORMATION FOR SHOOTING BULLETS
-    float bulletSpeed = .5f; // Speed the bullet moves
+    float bulletSpeed = 1.6f; // Speed the bullet moves
     float secondsUntilDestroyBullet = 10f; // Number of seconds before bullet is automatically destroyed.
     float startTime;
     private bool shouldFire;

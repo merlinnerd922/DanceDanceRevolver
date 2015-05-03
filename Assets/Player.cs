@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     int playerNum; // Player's player number.
     string stringRepOnScreen; // On-screen representation of the player's control pressed.
     private GUIStyle controlDisplayStyle; // The font style of the display of the controls pressed.
-    const int MAX_HP = 7; // The max amount of HP for each player
+    const int MAX_HP = 1; // The max amount of HP for each player
     public int currentHP; // The HP left that each player has.
     public Queue<float> queuedShots; // A queue of shots to be fired at the opponent.
     public Queue<List<PS4Pressable>> symbolsToPress;
@@ -39,24 +39,37 @@ public class Player : MonoBehaviour
 
     // Mappings between player number and location of where to draw the number of HP left.
     public List<Rect> locationToDrawHPRemaining = new List<Rect>() {
-        new Rect(50f, 50f, 50f, 50f),
-        new Rect(Screen.width - 100f - 200f, Screen.height - 100f, 100f, 50f)
+        new Rect(50f, 50f, 100f, 50f),
+        new Rect(Screen.width - 300f, Screen.height - 100f, 100f, 50f)
     };
 
     // Location of where to display all 3 - 5 symbols to press.
     public List<Rect> locationToDrawSymbolSequence = new List<Rect>() {
-        new Rect(50f, 100f, 50f, 50f),
-        new Rect(Screen.width - 100f - 250f, Screen.height - 150f, 100f, 50f)
+        new Rect(50f, 100f, 100f, 50f),
+        new Rect(Screen.width - 350f, Screen.height - 150f, 100f, 50f)
     };
 
-    public List<Rect> locationToDrawStatusMessage = new List<Rect>() {
-        new Rect(50f, 150f, 50f, 50f),
-        new Rect(Screen.width - 100f - 200f , Screen.height - 200f, 100f, 50f)
+    // Location of where to display all 3 - 5 symbols to press.
+    public List<Rect> baseLocationToDrawImageSymbolSequence = new List<Rect>() {
+        new Rect(50f, 100f, 50f, 50f),
+        new Rect(Screen.width - 350f, Screen.height - 150f, 50f, 50f)
     };
+
+    public Rect locationToDrawStatusMessage
+    {
+        get
+        {
+            Vector3 player1ScreenPos = MatchManager.mainCamera.WorldToScreenPoint(this.gameObject.transform.position);
+            player1ScreenPos.y = Screen.height - player1ScreenPos.y;
+            return new Rect(player1ScreenPos.x - 40, player1ScreenPos.y - 110, 100, 50);
+            
+        }
+    
+    }
 
     public List<Rect> locationToDrawDodgesLeft = new List<Rect>() {
-        new Rect(50f, 200f, 50f, 50f),
-        new Rect(Screen.width - 100f - 300f , Screen.height - 250f, 100f, 50f)
+        new Rect(50f, 150f, 100f, 50f),
+        new Rect(Screen.width - 400f , Screen.height - 200f, 100f, 50f)
     };
 
     public static Dictionary<PS4Pressable, string> pressableCharacterSymbolMapping = new Dictionary<PS4Pressable, string>() {
@@ -70,6 +83,18 @@ public class Player : MonoBehaviour
         { PS4Pressable.X, "X"}
     };
 
+    // Denotes mappings between pressable buttons and the locations of images.
+    public static Dictionary<PS4Pressable, Texture> pressableImageMapping = new Dictionary<PS4Pressable, Texture>() {
+        { PS4Pressable.L1, Resources.Load<Texture>("DuelloIcons/L1") },
+        { PS4Pressable.L2, Resources.Load<Texture>("DuelloIcons/L2") },
+        { PS4Pressable.R1, Resources.Load<Texture>("DuelloIcons/R1") },
+        { PS4Pressable.R2, Resources.Load<Texture>("DuelloIcons/R2") },
+        { PS4Pressable.TRIANGLE, Resources.Load<Texture>("DuelloIcons/triangle") }, 
+        { PS4Pressable.SQUARE, Resources.Load<Texture>("DuelloIcons/square") },
+        { PS4Pressable.CIRCLE, Resources.Load<Texture>("DuelloIcons/circle") },
+        { PS4Pressable.X, Resources.Load<Texture>("DuelloIcons/ex")}
+    };
+
     private Dictionary<PS4Pressable, Dictionary<string, ButtonState>> controlAxisStateMapping;
     public string mostRecentStatusMessage;
 
@@ -77,6 +102,7 @@ public class Player : MonoBehaviour
     private Texture hitGraphic;
     public bool isDodging;
     private Texture dodgeGraphic;
+    private GUIStyle playerStatusDisplay;
 
     // Call this special method to load characteristics associated with this player.
     public void PreStart(int _playerNum)
@@ -90,6 +116,12 @@ public class Player : MonoBehaviour
         controlDisplayStyle.normal.textColor = Color.black;
         controlDisplayStyle.font = Global.STENCIL;
         controlDisplayStyle.fontSize = 50;
+
+        playerStatusDisplay = new GUIStyle();
+        playerStatusDisplay.normal.textColor = Color.black;
+        playerStatusDisplay.font = Global.STENCIL;
+        playerStatusDisplay.fontSize = 50;
+        playerStatusDisplay.alignment = TextAnchor.MiddleCenter;
 
         // The player starts off with MAX_HP hit points.
         currentHP = MAX_HP;
@@ -123,6 +155,8 @@ public class Player : MonoBehaviour
         dodgeGraphic = Resources.Load<Texture>("DuelloIcons/dodge");
 
         isDodging = false;
+        stringRepOnScreen = "";
+
 
     }
 
@@ -176,76 +210,6 @@ public class Player : MonoBehaviour
 
 
     //}
-    void UpdateGetInput()
-    {
-        bool inputBoolVal;
-
-        // Check each given possible control button/axis to see if it's been pressed/toggled.
-        foreach (PS4Control c in Enum.GetValues(typeof(PS4Control))) {
-
-            if (c.IsAny(PS4Control.L3, PS4Control.R3)) {
-
-                inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
-                if (inputBoolVal) {
-                    stringRepOnScreen = c.ToString();
-                    if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.INACTIVE) {
-                        controlButtonStateMapping[c]["currentButtonState"] = ButtonState.ACTIVE;
-                        controlButtonStateMapping[c]["prevButtonState"] = ButtonState.INACTIVE;
-                    }
-                } 
-                else {
-                    if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.ACTIVE) {
-                        controlButtonStateMapping[c]["currentButtonState"] = ButtonState.INACTIVE;
-                        controlButtonStateMapping[c]["prevButtonState"] = ButtonState.ACTIVE;
-
-                        if (dodgesLeft > 0) {
-                            dodgesLeft--;
-                            isDodging = true;
-                        }
-
-                    }
-                }
-
-            }
-
-            // For buttons, check to see if they've been pressed, and if so, update the most recently pressed control.
-            else if (c.IsButton()) {
-
-                inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
-                if (inputBoolVal) {
-                    stringRepOnScreen = c.ToString();
-                    if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.INACTIVE) {
-                        controlButtonStateMapping[c]["currentButtonState"] = ButtonState.ACTIVE;
-                        controlButtonStateMapping[c]["prevButtonState"] = ButtonState.INACTIVE;
-                    }
-                }
-                else {
-
-                    if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.ACTIVE) {
-                        controlButtonStateMapping[c]["currentButtonState"] = ButtonState.INACTIVE;
-                        controlButtonStateMapping[c]["prevButtonState"] = ButtonState.ACTIVE;
-
-                        if (currentActiveKeySequence[numSymbolsPressed] == c.ToPS4Pressable()) {
-                            numSymbolsPressed += 1;
-                            if (numSymbolsPressed == currentActiveKeySequence.Count) {
-                                numSymbolsPressed = 0;
-                                FireOneShot();
-                            }
-                        }
-                        else {
-                            numSymbolsPressed = 0;
-                        }
-
-
-
-                    }
-
-                }
-
-            }
-        }
-    }
-
     // Update the player control.
     void Update()
     {
@@ -263,13 +227,30 @@ public class Player : MonoBehaviour
             // Check each given possible control button/axis to see if it's been pressed/toggled.
             foreach (PS4Control c in Enum.GetValues(typeof(PS4Control))) {
 
-                if (c.IsAny(PS4Control.R3, PS4Control.L3)) {
+                if (c.IsAny(PS4Control.L3, PS4Control.R3)) {
+
                     inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
                     if (inputBoolVal) {
                         stringRepOnScreen = c.ToString();
+                        if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.INACTIVE) {
+                            controlButtonStateMapping[c]["currentButtonState"] = ButtonState.ACTIVE;
+                            controlButtonStateMapping[c]["prevButtonState"] = ButtonState.INACTIVE;
+                        }
                     }
-                    
-                    continue;
+                    else {
+                        if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.ACTIVE) {
+                            controlButtonStateMapping[c]["currentButtonState"] = ButtonState.INACTIVE;
+                            controlButtonStateMapping[c]["prevButtonState"] = ButtonState.ACTIVE;
+
+                            if (dodgesLeft > 0) {
+                                mostRecentStatusMessage = "DODGE!";
+                                dodgesLeft--;
+                                isDodging = true;
+                            }
+
+                        }
+                    }
+
                 }
 
                 // For buttons, check to see if they've been pressed, and if so, update the most recently pressed control.
@@ -394,27 +375,35 @@ public class Player : MonoBehaviour
         GUI.Label(new Rect(0, Screen.height - 50, 50, 50), stringRepOnScreen, controlDisplayStyle);
 
         // Display the amount of HP each player has.
-        GUI.Label(locationToDrawHPRemaining[playerNum - 1],
-                                                String.Format("HP: {0} / {1}", currentHP.ToString(), MAX_HP.ToString()), controlDisplayStyle);
+        GUI.Label(locationToDrawHPRemaining[playerNum - 1], String.Format("HP: {0} / {1}", currentHP.ToString(),
+                  MAX_HP.ToString()), controlDisplayStyle);
 
 
         // Display the message associating the status of the most recently used bullet.
-        if (mostRecentStatusMessage == "BLOCKED!") {
-            GUI.DrawTexture(locationToDrawStatusMessage[playerNum - 1], clashGraphic, ScaleMode.StretchToFill, true);
+        
+
+		if (mostRecentStatusMessage == "BLOCKED!") {
+            GUI.DrawTexture(locationToDrawStatusMessage, clashGraphic, ScaleMode.StretchToFill, true);
         }
         else if (mostRecentStatusMessage == "HIT!") {
-            GUI.DrawTexture(locationToDrawStatusMessage[playerNum - 1], hitGraphic, ScaleMode.StretchToFill, true);
+            GUI.DrawTexture(locationToDrawStatusMessage, hitGraphic, ScaleMode.StretchToFill, true);
         }
         else if (mostRecentStatusMessage == "DODGE!") {
-            GUI.DrawTexture(locationToDrawStatusMessage[playerNum - 1], dodgeGraphic, ScaleMode.StretchToFill, true);
+            GUI.DrawTexture(locationToDrawStatusMessage, dodgeGraphic, ScaleMode.StretchToFill, true);
         }
-
-        else {
-            GUI.Label(locationToDrawStatusMessage[playerNum - 1], mostRecentStatusMessage, controlDisplayStyle);
+        else if (mostRecentStatusMessage != "") {
+            GUI.Label(locationToDrawStatusMessage, mostRecentStatusMessage, playerStatusDisplay);
         }
 
         // Display the message displaying the current sequence of symbols to select.
-        GUI.Label(locationToDrawSymbolSequence[playerNum - 1], currentActiveKeySequence.ToOnScreenRep(numSymbolsPressed), controlDisplayStyle);
+        //GUI.Label(locationToDrawSymbolSequence[playerNum - 1], currentActiveKeySequence.ToOnScreenRep(numSymbolsPressed), controlDisplayStyle);
+        int j = 0;
+        foreach (PS4Pressable symbol in currentActiveKeySequence) {
+            if (j >= numSymbolsPressed) {
+                GUI.DrawTexture(baseLocationToDrawImageSymbolSequence[playerNum - 1].AddToX(50 * (j - numSymbolsPressed)), pressableImageMapping[symbol]);
+            }
+            j++;
+        }
 
         // Display the number of dodges on screen.
         GUI.Label(locationToDrawDodgesLeft[playerNum - 1], String.Format("Dodges left: {0}", dodgesLeft), controlDisplayStyle);

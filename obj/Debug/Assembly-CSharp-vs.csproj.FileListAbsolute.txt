@@ -10,3 +10,5 @@ C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\Unity.DataCont
 C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\ICSharpCode.NRefactory.dll
 C:\Users\SDA\Documents\Projects\DanceDanceRevolver\obj\Debug\Assembly-CSharp.dll
 C:\Users\SDA\Documents\Projects\DanceDanceRevolver\obj\Debug\Assembly-CSharp.pdb
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\Assembly-CSharp-firstpass.pdb
+C:\Users\SDA\Documents\Projects\DanceDanceRevolver\Temp\bin\Debug\Assembly-UnityScript-firstpass.dll

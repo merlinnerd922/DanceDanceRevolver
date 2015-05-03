@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 // A namespace (and by extension, a class) containing several extension methods.
 namespace ExtendSpace
@@ -73,7 +75,40 @@ namespace ExtendSpace
             return Helper.controlPressableMapping[c];
         }
 
+        public static Rect AddToX(this Rect r, float addValToX) {
+            Rect returnRect = new Rect(r.xMin, r.yMin, r.width, r.height);
+            returnRect.x += addValToX;
+            return returnRect;
+        }
 
+        public static Vector3 ToVector3(this Quaternion q1)
+        {
+            float sqw = q1.w * q1.w;
+            float sqx = q1.x * q1.x;
+            float sqy = q1.y * q1.y;
+            float sqz = q1.z * q1.z;
+            float unit = sqx + sqy + sqz + sqw; // if normalised is one, otherwise is correction factor
+            float test = q1.x * q1.w - q1.y * q1.z;
+            Vector3 v;
+
+            if (test > 0.4995f * unit) { // singularity at north pole
+                v.y = 2f * Mathf.Atan2(q1.y, q1.x);
+                v.x = Mathf.PI / 2;
+                v.z = 0;
+                return Helper.NormalizeAngles(v * Mathf.Rad2Deg);
+            }
+            if (test < -0.4995f * unit) { // singularity at south pole
+                v.y = -2f * Mathf.Atan2(q1.y, q1.x);
+                v.x = -Mathf.PI / 2;
+                v.z = 0;
+                return Helper.NormalizeAngles(v * Mathf.Rad2Deg);
+            }
+            Quaternion q = new Quaternion(q1.w, q1.z, q1.x, q1.y);
+            v.y = (float)Math.Atan2(2f * q.x * q.w + 2f * q.y * q.z, 1 - 2f * (q.z * q.z + q.w * q.w));     // Yaw
+            v.x = (float)Math.Asin(2f * (q.x * q.z - q.w * q.y));                             // Pitch
+            v.z = (float)Math.Atan2(2f * q.x * q.y + 2f * q.z * q.w, 1 - 2f * (q.y * q.y + q.z * q.z));      // Roll
+            return Helper.NormalizeAngles(v * Mathf.Rad2Deg);
+        }
 
     }
 

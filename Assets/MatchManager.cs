@@ -5,7 +5,6 @@ using UnityEngine;
 // A class that manages the match.
 public class MatchManager : MonoBehaviour
 {
-
     const float TIME_DISPLAY_RULES = 5f; // Amount of time spent to display the rules
     float timerDisplayRules; // Timer to keep track of how long to display the rules
     private bool displayRules; // Indicates whether we should display the rules
@@ -33,9 +32,23 @@ public class MatchManager : MonoBehaviour
 
     // Exclusive to Unity testing environments only. If run as the executable itself and not in the Unity window,
     // this assignment will be ignored. This variable manages the mapping of controls.
-    #if UNITY_EDITOR
-        ControlManager CONTROL_MANAGER;
-    #endif
+#if UNITY_EDITOR
+    ControlManager CONTROL_MANAGER;
+#endif
+
+    public static Camera mainCamera;
+    private GameVictoryStatus gameVictoryStatus;
+    private string finalVictoryMessage;
+    private GUIStyle gameEndsMessageStyle;
+
+    public bool gameOver
+    {
+        get
+        {
+            return playerScripts[0].currentHP <= 0 || playerScripts[1].currentHP <= 0;
+        }
+
+    }
 
     // Load the match screen.
     void Start()
@@ -57,18 +70,24 @@ public class MatchManager : MonoBehaviour
         startMessageStyle.fontSize = 200;
         startMessageStyle.alignment = TextAnchor.MiddleCenter;
 
+        gameEndsMessageStyle = new GUIStyle();
+        gameEndsMessageStyle.normal.textColor = Helper.DARK_RED;
+        gameEndsMessageStyle.font = Global.STENCIL;
+        gameEndsMessageStyle.fontSize = 150;
+        gameEndsMessageStyle.alignment = TextAnchor.MiddleCenter;
+
         // Retrieve the list of all player character objects, and add the script component
         // PlayerScript.cs to each player.
         playerList = new List<GameObject>() { GameObject.Find("Player1"), GameObject.Find("Player2") };
 
         // If the namespace UnityEditor is defined, update the values of the input axes if the flag is set to true (
         // do this in Global.cs).
-        #if UNITY_EDITOR
-            if (Global.REDEFINE_INPUT_AXES) {
-                CONTROL_MANAGER = new ControlManager();
-                CONTROL_MANAGER.RedefineInputManager();
-            }
-        #endif
+#if UNITY_EDITOR
+        if (Global.REDEFINE_INPUT_AXES) {
+            CONTROL_MANAGER = new ControlManager();
+            CONTROL_MANAGER.RedefineInputManager();
+        }
+#endif
 
         // Get a list of all the consoles and controls plugged in.
         string[] joystickList = Input.GetJoystickNames();
@@ -80,26 +99,36 @@ public class MatchManager : MonoBehaviour
             if (playerList[i].GetComponent<Player>() == null) {
                 playerList[i].AddComponent<Player>();
             }
-            playerList[i].GetComponent<Player>().PreStart(i + 1);
         }
 
         // Generate a list of player scripts representing each of the players, and add
         // the Player components to the list.
-        playerScripts = new List<Player>() { };
+        playerScripts = new List<Player>() {
+        };
         playerList.ForEach(x => playerScripts.Add(x.GetComponent<Player>()));
 
-        // Populate the sequence of keys to be pressed with 20 items.
-
         for (int i = 0; i < 2; i++) {
+            playerScripts[i].PreStart(i + 1);
             playerScripts[i].symbolsToPress = new Queue<List<PS4Pressable>>();
         }
 
+        //Vector2 player1LocationToScreen;
+        //Player.locationToDrawStatusMessage = new List<Rect>();
+        //for (int i = 0; i < 2; i++) {
+        //    player1LocationToScreen = Camera.main.WorldToViewportPoint(playerScripts[0].transform.position);
+        //    Player.locationToDrawStatusMessage.Add(new Rect(player1LocationToScreen.x, player1LocationToScreen.y,
+        //        50, 50));
+        //}
+
+        // Populate the sequence of keys to be pressed with 20 items.
         for (int j = 0; j < 20; j++) {
             List<PS4Pressable> sequenceToAdd = Helper.GetRandomListOfKeysToPress();
             for (int i = 0; i < 2; i++) {
                 playerScripts[i].symbolsToPress.Enqueue(sequenceToAdd);
             }
         }
+
+        mainCamera = GameObject.Find("Main Camera").GetComponent<Camera>();
 
     }
 
@@ -142,72 +171,15 @@ public class MatchManager : MonoBehaviour
         // Once the timer to display the go message counts down, the game has begun!
         if (timerToDisplayGoMessage <= 0f) {
 
-            bool player1FiredBullet = playerScripts[0].queuedShots.Count != 0;
-            bool player2FiredBullet = playerScripts[1].queuedShots.Count != 0;
+            if (!gameOver) {
 
-            // Player 1 fires a bullet and player 2 doesn't.
-            if (player1FiredBullet && !player2FiredBullet) {
-                playerScripts[0].queuedShots.Dequeue();
 
-                if (!playerScripts[0].isDodging) {
-                    playerScripts[1].DecrementHP(1);
-                    playerScripts[1].mostRecentStatusMessage = "OUCH!";
-                    playerScripts[0].mostRecentStatusMessage = "HIT!";
-                }
-                else {
-                    playerScripts[0].isDodging = false;
-                    playerScripts[1].mostRecentStatusMessage = "DODGE!";
-                    playerScripts[0].mostRecentStatusMessage = "MISSED!";
-                }
-            }
 
-            // Player 2 fires a bullet and player 1 doesn't.
-            else if (!player1FiredBullet && player2FiredBullet) {
-                
-                playerScripts[1].queuedShots.Dequeue();
+                bool player1FiredBullet = playerScripts[0].queuedShots.Count != 0;
+                bool player2FiredBullet = playerScripts[1].queuedShots.Count != 0;
 
-                if (!playerScripts[1].isDodging) {
-                    playerScripts[0].DecrementHP(1);
-                    playerScripts[0].mostRecentStatusMessage = "OUCH!";
-                    playerScripts[1].mostRecentStatusMessage = "HIT!";
-                }
-                else {
-                    playerScripts[1].isDodging = false;
-                    playerScripts[0].mostRecentStatusMessage = "DODGE!";
-                    playerScripts[1].mostRecentStatusMessage = "MISSED!";
-
-                }
-
-            }
-
-            else if (player1FiredBullet && player2FiredBullet) {
-                float player1Time = Math.Abs(playerScripts[0].queuedShots.Peek());
-                float player2Time = Math.Abs(playerScripts[1].queuedShots.Peek());
-
-                // Tied bullet strikes
-                if (Math.Abs(player1Time - player2Time) <= 0.05) {
-                    playerScripts[1].queuedShots.Dequeue();
-                    playerScripts[0].queuedShots.Dequeue();
-
-                    playerScripts[0].mostRecentStatusMessage = "BLOCKED!";
-                    playerScripts[1].mostRecentStatusMessage = "BLOCKED!";
-                }
-
-                // 
-                else if (player1Time > player2Time) {
-                    playerScripts[1].queuedShots.Dequeue();
-
-                    if (!playerScripts[1].isDodging) {
-                        playerScripts[0].DecrementHP(1);
-                        playerScripts[0].mostRecentStatusMessage = "OUCH!";
-                        playerScripts[1].mostRecentStatusMessage = "HIT!";
-                    }
-                    else {
-                        playerScripts[1].isDodging = false;
-                    }
-                }
-
-                else if (player2Time > player1Time) {
+                // Player 1 fires a bullet and player 2 doesn't.
+                if (player1FiredBullet && !player2FiredBullet) {
                     playerScripts[0].queuedShots.Dequeue();
 
                     if (!playerScripts[0].isDodging) {
@@ -222,14 +194,104 @@ public class MatchManager : MonoBehaviour
                     }
                 }
 
+                // Player 2 fires a bullet and player 1 doesn't.
+                else if (!player1FiredBullet && player2FiredBullet) {
+
+                    playerScripts[1].queuedShots.Dequeue();
+
+                    if (!playerScripts[1].isDodging) {
+                        playerScripts[0].DecrementHP(1);
+                        playerScripts[0].mostRecentStatusMessage = "OUCH!";
+                        playerScripts[1].mostRecentStatusMessage = "HIT!";
+                    }
+                    else {
+                        playerScripts[1].isDodging = false;
+                        playerScripts[0].mostRecentStatusMessage = "DODGE!";
+                        playerScripts[1].mostRecentStatusMessage = "MISSED!";
+
+                    }
+
+                }
+
+                else if (player1FiredBullet && player2FiredBullet) {
+                    float player1Time = Math.Abs(playerScripts[0].queuedShots.Peek());
+                    float player2Time = Math.Abs(playerScripts[1].queuedShots.Peek());
+
+                    // Tied bullet strikes
+                    if (Math.Abs(player1Time - player2Time) <= 0.05) {
+                        playerScripts[1].queuedShots.Dequeue();
+                        playerScripts[0].queuedShots.Dequeue();
+
+                        playerScripts[0].mostRecentStatusMessage = "BLOCKED!";
+                        playerScripts[1].mostRecentStatusMessage = "BLOCKED!";
+                    }
+
+                    // 
+                    else if (player1Time > player2Time) {
+                        playerScripts[1].queuedShots.Dequeue();
+
+                        if (!playerScripts[1].isDodging) {
+                            playerScripts[0].DecrementHP(1);
+                            playerScripts[0].mostRecentStatusMessage = "OUCH!";
+                            playerScripts[1].mostRecentStatusMessage = "HIT!";
+                        }
+                        else {
+                            playerScripts[1].isDodging = false;
+                        }
+                    }
+
+                    else if (player2Time > player1Time) {
+                        playerScripts[0].queuedShots.Dequeue();
+
+                        if (!playerScripts[0].isDodging) {
+                            playerScripts[1].DecrementHP(1);
+                            playerScripts[1].mostRecentStatusMessage = "OUCH!";
+                            playerScripts[0].mostRecentStatusMessage = "HIT!";
+                        }
+                        else {
+                            playerScripts[0].isDodging = false;
+                            playerScripts[1].mostRecentStatusMessage = "DODGE!";
+                            playerScripts[0].mostRecentStatusMessage = "MISSED!";
+                        }
+                    }
+
+                }
+
+                playerScripts[0].isDodging = false;
+                playerScripts[1].isDodging = false;
+
+                if (gameOver) {
+                    CheckAndDisplayFinalScores();
+                }
+
+
             }
 
-            playerScripts[0].isDodging = false;
-            playerScripts[1].isDodging = false;
+            else if (gameOver) {
+                CheckAndDisplayFinalScores();
+            }
 
         }
 
     }
+
+    private void CheckAndDisplayFinalScores()
+    {
+        if (playerScripts[0].currentHP > 0 && playerScripts[1].currentHP <= 0) {
+            gameVictoryStatus = GameVictoryStatus.PLAYER_1_WINS;
+        }
+        else if (playerScripts[0].currentHP <= 0 && playerScripts[1].currentHP > 0) {
+            gameVictoryStatus = GameVictoryStatus.PLAYER_2_WINS;
+        }
+        else {
+            gameVictoryStatus = GameVictoryStatus.DRAW;
+        }
+
+
+    }
+
+
+
 
     // Update the display on-screen every frame.
     void OnGUI()
@@ -251,6 +313,39 @@ public class MatchManager : MonoBehaviour
                        START_MESSAGE_HEIGHT), "DRAW!", startMessageStyle);
         }
 
+        if (gameOver) {
+
+            Rect finalDisplayRectangle = new Rect(Screen.width /2f - 100f / 2f, Screen.height/2f - 50f / 2f, 100f, 50f);
+
+            switch (gameVictoryStatus) {
+                case (GameVictoryStatus.PLAYER_1_WINS): {
+                        finalVictoryMessage = "Player 1 wins!";
+                        break;
+                    }
+                case (GameVictoryStatus.PLAYER_2_WINS): {
+                        finalVictoryMessage = "Player 2 wins!";
+                        break;
+                    }
+                case (GameVictoryStatus.DRAW): {
+                        finalVictoryMessage = "Draw! Both players dead!";
+                        break;
+                    }
+            }
+
+
+            GUI.Label(finalDisplayRectangle, finalVictoryMessage, gameEndsMessageStyle);
+
+        }
+
+
     }
+
+}
+
+enum GameVictoryStatus
+{
+    PLAYER_1_WINS,
+    PLAYER_2_WINS,
+    DRAW
 
 }
