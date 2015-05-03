@@ -50,14 +50,27 @@ public class MatchManager : MonoBehaviour
 
     }
 
+    public const float TIME_TO_WAIT_BEFORE_RESTART = 5f;
+    public float timerToWaitBeforeRestart;
+
+    private Rect levelReloadingRectangle = new Rect(Screen.width / 2f - 100f / 2f,
+                                                    (0.75f * Screen.height) - 50f / 2f,
+                                                    100f, 50f);
+    private string levelReloadingMessage = "LOADING ANOTHER MATCH, PLEASE WAIT...";
+    private GUIStyle levelReloadingStyle;
+
     // Load the match screen.
     void Start()
     {
+
+
 
         // Set all the timers for doing stuff on-screen.
         timerToWaitAfterDrawBeforeBattle = Global.TEST_MODE ? 0f : Helper.NextFloat(5f, 10f);
         timerToDisplayGoMessage = Global.TEST_MODE ? 0f : TIME_TO_DISPLAY_GO_MESSAGE;
         timerDisplayRules = Global.TEST_MODE ? 0f : TIME_DISPLAY_RULES;
+
+        timerToWaitBeforeRestart = TIME_TO_WAIT_BEFORE_RESTART;
 
         // Don't display the messages for "GO!" or "DRAW!" at all, until time warrants it. 
         displayGoMessage = false;
@@ -65,16 +78,22 @@ public class MatchManager : MonoBehaviour
 
         // Initialize the style for displaying the "GO!" and "DRAW!" messages.
         startMessageStyle = new GUIStyle();
-        startMessageStyle.normal.textColor = Color.black;
+        startMessageStyle.normal.textColor = new Color(173f / 255f, 216f / 255f, 230f / 255f);
         startMessageStyle.font = Global.STENCIL;
-        startMessageStyle.fontSize = 200;
+        startMessageStyle.fontSize = 100;
         startMessageStyle.alignment = TextAnchor.MiddleCenter;
 
         gameEndsMessageStyle = new GUIStyle();
-        gameEndsMessageStyle.normal.textColor = Helper.DARK_RED;
+        gameEndsMessageStyle.normal.textColor = Color.red;
         gameEndsMessageStyle.font = Global.STENCIL;
         gameEndsMessageStyle.fontSize = 150;
         gameEndsMessageStyle.alignment = TextAnchor.MiddleCenter;
+
+        levelReloadingStyle = new GUIStyle();
+        levelReloadingStyle.normal.textColor = Color.yellow;
+        levelReloadingStyle.font = Global.STENCIL;
+        levelReloadingStyle.fontSize = 50;
+        levelReloadingStyle.alignment = TextAnchor.MiddleCenter;
 
         // Retrieve the list of all player character objects, and add the script component
         // PlayerScript.cs to each player.
@@ -112,14 +131,6 @@ public class MatchManager : MonoBehaviour
             playerScripts[i].symbolsToPress = new Queue<List<PS4Pressable>>();
         }
 
-        //Vector2 player1LocationToScreen;
-        //Player.locationToDrawStatusMessage = new List<Rect>();
-        //for (int i = 0; i < 2; i++) {
-        //    player1LocationToScreen = Camera.main.WorldToViewportPoint(playerScripts[0].transform.position);
-        //    Player.locationToDrawStatusMessage.Add(new Rect(player1LocationToScreen.x, player1LocationToScreen.y,
-        //        50, 50));
-        //}
-
         // Populate the sequence of keys to be pressed with 20 items.
         for (int j = 0; j < 20; j++) {
             List<PS4Pressable> sequenceToAdd = Helper.GetRandomListOfKeysToPress();
@@ -147,7 +158,7 @@ public class MatchManager : MonoBehaviour
         if (timerDisplayRules > 0f) {
             displayRules = true;
             timerDisplayRules -= Time.deltaTime;
-            startMessageStyle.fontSize = 150;
+            startMessageStyle.fontSize = 80;
         }
         else {
             displayRules = false;
@@ -262,6 +273,14 @@ public class MatchManager : MonoBehaviour
 
                 if (gameOver) {
                     CheckAndDisplayFinalScores();
+
+                    // Wait 
+                    if (timerToWaitBeforeRestart >= 0f) {
+                        timerToWaitBeforeRestart -= Time.deltaTime;
+                    }
+                    else {
+                        Application.LoadLevel(Application.loadedLevel);
+                    }
                 }
 
 
@@ -269,6 +288,14 @@ public class MatchManager : MonoBehaviour
 
             else if (gameOver) {
                 CheckAndDisplayFinalScores();
+
+                // Wait 
+                if (timerToWaitBeforeRestart >= 0f) {
+                    timerToWaitBeforeRestart -= Time.deltaTime;
+                }
+                else {
+                    Application.LoadLevel(Application.loadedLevel);
+                }
             }
 
         }
@@ -302,7 +329,7 @@ public class MatchManager : MonoBehaviour
             GUI.Label(new Rect((float)Screen.width / 2f - (START_MESSAGE_WIDTH / 2f),
                                (float)Screen.height / 2f - (START_MESSAGE_HEIGHT / 2f),
                                START_MESSAGE_WIDTH,
-                               START_MESSAGE_HEIGHT), "VOXEL SUCKS ASS!", startMessageStyle);
+                               START_MESSAGE_HEIGHT), "GET READY TO ATTACK...!", startMessageStyle);
         }
 
         // Display the message to begin shooting after somewhere between 5 to 10 seconds.
@@ -315,7 +342,7 @@ public class MatchManager : MonoBehaviour
 
         if (gameOver) {
 
-            Rect finalDisplayRectangle = new Rect(Screen.width /2f - 100f / 2f, Screen.height/2f - 50f / 2f, 100f, 50f);
+            Rect finalDisplayRectangle = new Rect(Screen.width / 2f - 100f / 2f, Screen.height / 2f - 50f / 2f, 100f, 50f);
 
             switch (gameVictoryStatus) {
                 case (GameVictoryStatus.PLAYER_1_WINS): {
@@ -334,6 +361,9 @@ public class MatchManager : MonoBehaviour
 
 
             GUI.Label(finalDisplayRectangle, finalVictoryMessage, gameEndsMessageStyle);
+
+            GUI.Label(levelReloadingRectangle, levelReloadingMessage, levelReloadingStyle);
+
 
         }
 

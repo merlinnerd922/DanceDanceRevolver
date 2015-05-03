@@ -22,13 +22,10 @@ public class Player : MonoBehaviour
     int playerNum; // Player's player number.
     string stringRepOnScreen; // On-screen representation of the player's control pressed.
     private GUIStyle controlDisplayStyle; // The font style of the display of the controls pressed.
-    const int MAX_HP = 1; // The max amount of HP for each player
+    static int MAX_HP; // The max amount of HP for each player
     public int currentHP; // The HP left that each player has.
     public Queue<float> queuedShots; // A queue of shots to be fired at the opponent.
     public Queue<List<PS4Pressable>> symbolsToPress;
-
-    public ButtonState currentButtonState;
-    public ButtonState prevButtonState;
 
     private bool sequenceIsNotActive; // A boolean indicating that there is currently no sequence of keys on-screen for the user to press.
     private List<PS4Pressable> currentActiveKeySequence; // A sequence indicating the current active sequence of keys to press.
@@ -107,18 +104,20 @@ public class Player : MonoBehaviour
     // Call this special method to load characteristics associated with this player.
     public void PreStart(int _playerNum)
     {
+        MAX_HP = Global.TEST_MODE ? 1 : 7;
+
         bullet = Resources.Load<GameObject>("Bullet");
         playerNum = _playerNum; // Player number
         dodgesLeft = MAX_DODGES;
 
         // Create style for displaying info on the control most recently pressed.
         controlDisplayStyle = new GUIStyle();
-        controlDisplayStyle.normal.textColor = Color.black;
+        controlDisplayStyle.normal.textColor = new Color(173f / 255f, 216f/ 255f, 230f/ 255f);
         controlDisplayStyle.font = Global.STENCIL;
         controlDisplayStyle.fontSize = 50;
 
         playerStatusDisplay = new GUIStyle();
-        playerStatusDisplay.normal.textColor = Color.black;
+        playerStatusDisplay.normal.textColor = new Color(173f / 255f, 216f/ 255f, 230f/ 255f);
         playerStatusDisplay.font = Global.STENCIL;
         playerStatusDisplay.fontSize = 50;
         playerStatusDisplay.alignment = TextAnchor.MiddleCenter;
@@ -129,8 +128,6 @@ public class Player : MonoBehaviour
         // Initialize the queue of shots to be fired at the opponent.
         queuedShots = new Queue<float>();
 
-        currentButtonState = ButtonState.INACTIVE;
-        prevButtonState = ButtonState.INACTIVE;
 
         controlButtonStateMapping = Helper.PS4Buttons.ToDictionary(x => x, x => new Dictionary<string, ButtonState>() {
             { "currentButtonState", ButtonState.INACTIVE }, 
@@ -157,7 +154,6 @@ public class Player : MonoBehaviour
         isDodging = false;
         stringRepOnScreen = "";
 
-
     }
 
     // Fire one shot at the opponent.
@@ -177,39 +173,6 @@ public class Player : MonoBehaviour
 
     }
 
-    //// Update this character based on controls pressed..
-    //PS4Control? UpdateControls()
-    //{
-    //    PS4Control? returnPS4control = null;
-
-    //    // Check each given possible control button/axis to see if it's been pressed/toggled.
-    //    foreach (PS4Control c in Enum.GetValues(typeof(PS4Control))) {
-
-    //        // For buttons, check to see if they've been pressed, and if so, update the most recently pressed control.
-    //        if (c.IsButton()) {
-
-    //            inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
-    //            if (inputBoolVal) {
-    //                stringRepOnScreen = c.ToString();
-    //                if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.INACTIVE) {
-    //                    controlButtonStateMapping[c]["currentButtonState"] = ButtonState.ACTIVE;
-    //                    controlButtonStateMapping[c]["prevButtonState"] = ButtonState.INACTIVE;
-    //                }
-    //            }
-    //            else {
-
-    //                if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.ACTIVE) {
-    //                    controlButtonStateMapping[c]["currentButtonState"] = ButtonState.INACTIVE;
-    //                    controlButtonStateMapping[c]["prevButtonState"] = ButtonState.ACTIVE;
-    //                }
-
-    //            }
-
-    //        }
-    //    }
-
-
-    //}
     // Update the player control.
     void Update()
     {

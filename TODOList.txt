@@ -1,4 +1,2 @@
-- Prevent rotation beyond 180 degrees.
-- Press a button to restart all.
 
 - Bullets collide
