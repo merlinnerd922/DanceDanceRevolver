@@ -392,19 +392,22 @@ public class Player : MonoBehaviour
                                                 String.Format("HP: {0} / {1}", currentHP.ToString(), MAX_HP.ToString()), controlDisplayStyle);
 
 
+        // Display the message associating the status of the most recently used bullet.
         if (mostRecentStatusMessage == "BLOCKED!") {
             GUI.DrawTexture(locationToDrawStatusMessage[playerNum - 1], clashGraphic, ScaleMode.StretchToFill, true);
         }
         else if (mostRecentStatusMessage == "HIT!") {
             GUI.DrawTexture(locationToDrawStatusMessage[playerNum - 1], hitGraphic, ScaleMode.StretchToFill, true);
         }
-        else {
-            // Display the message associating the status of the most recently used bullet.
+        else {    
             GUI.Label(locationToDrawStatusMessage[playerNum - 1], mostRecentStatusMessage, controlDisplayStyle);
         }
 
         // Display the message displaying the current sequence of symbols to select.
         GUI.Label(locationToDrawSymbolSequence[playerNum - 1], currentActiveKeySequence.ToOnScreenRep(numSymbolsPressed), controlDisplayStyle);
+
+
+        // Display the number of dodges
     }
 
 
