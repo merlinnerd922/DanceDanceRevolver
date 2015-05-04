@@ -202,7 +202,7 @@ public class Player : MonoBehaviour
             bool inputBoolVal;
 
             // Check each given possible control button/axis to see if it's been pressed/toggled.
-            foreach (PS4Control c in Helper.PS4Controls) {
+            foreach (PS4Control c in Helper.PS4Buttons) {
 
                 inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c)); // Determine whether the button was pressed.
                 buttonStates = controlButtonStateMapping[c]; // Get the current and previous states of the given control.
