@@ -16,7 +16,7 @@ Platform assembly: C:\Users\SDA\Documents\Projects\DanceDanceRevolver\DanceDance
 Loading C:\Users\SDA\Documents\Projects\DanceDanceRevolver\DanceDanceRevolver_Data\Managed\Assembly-UnityScript-firstpass.dll into Unity Child Domain
 Platform assembly: C:\Users\SDA\Documents\Projects\DanceDanceRevolver\DanceDanceRevolver_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading C:\Users\SDA\Documents\Projects\DanceDanceRevolver\DanceDanceRevolver_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.091 seconds
+- Completed reload, in  0.158 seconds
 <RI> Initializing input.
 <RI> Input initialized.
 desktop: 1366x768 60Hz; virtual: 1366x768 at 0,0

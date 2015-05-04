@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
+// An enumeration denoting whether a pressed button/axis is currently active (pressed) or inactive (unpressed).
 public enum ButtonState
 {
     INACTIVE,
@@ -13,8 +14,8 @@ public enum ButtonState
 // A class denoting a script attached to each player object.
 public class Player : MonoBehaviour
 {
-    const int MAX_DODGES = 3;
-    int dodgesLeft = 3;
+    const int MAX_DODGES = 3; // Denotes the maximum number of times one can dodge a bullet.
+    int currentDodgesLeft; // Denotes the number of opportunities that one has left to dodge a bullet.
 
     // This is the bullet prefab the will be instantiated when the player clicks
     GameObject newBullet, bullet;
@@ -25,13 +26,17 @@ public class Player : MonoBehaviour
     static int MAX_HP; // The max amount of HP for each player
     public int currentHP; // The HP left that each player has.
     public Queue<float> queuedShots; // A queue of shots to be fired at the opponent.
-    public Queue<List<PS4Pressable>> symbolsToPress;
+
+    // Represents the current queue of sequences of symbols that one currently has to press.
+    public Queue<List<PS4Pressable>> symbolsToPress; 
 
     private bool sequenceIsNotActive; // A boolean indicating that there is currently no sequence of keys on-screen for the user to press.
     private List<PS4Pressable> currentActiveKeySequence; // A sequence indicating the current active sequence of keys to press.
 
-    public int numSymbolsPressed;
+    // Denotes how many symbols out of the number of symbols in the current sequence that the player is processing right now.
+    public int numSymbolsPressed; 
 
+    // Denotes a mapping between each control, and its previous and current button state.
     public Dictionary<PS4Control, Dictionary<string, ButtonState>> controlButtonStateMapping;
 
     // Mappings between player number and location of where to draw the number of HP left.
@@ -41,34 +46,32 @@ public class Player : MonoBehaviour
     };
 
     // Location of where to display all 3 - 5 symbols to press.
-    public List<Rect> locationToDrawSymbolSequence = new List<Rect>() {
-        new Rect(50f, 100f, 100f, 50f),
-        new Rect(Screen.width - 350f, Screen.height - 150f, 100f, 50f)
-    };
-
-    // Location of where to display all 3 - 5 symbols to press.
     public List<Rect> baseLocationToDrawImageSymbolSequence = new List<Rect>() {
         new Rect(50f, 100f, 50f, 50f),
         new Rect(Screen.width - 350f, Screen.height - 150f, 50f, 50f)
     };
 
+    // Represents the location of where to draw the current status message about information such as whether
+    // the player has successfully shot the opponent, has successully dodged an opponent etc.
     public Rect locationToDrawStatusMessage
     {
+        // Convert the player's world position to screen coordinates, and adjust the information so that 
+        // it's above the player's head. Then return the rectangle as to where that information should be displayed.
         get
         {
             Vector3 player1ScreenPos = MatchManager.mainCamera.WorldToScreenPoint(this.gameObject.transform.position);
             player1ScreenPos.y = Screen.height - player1ScreenPos.y;
-            return new Rect(player1ScreenPos.x - 40, player1ScreenPos.y - 110, 100, 50);
-            
+            return new Rect(player1ScreenPos.x - 40, player1ScreenPos.y - 110, 100, 50);   
         }
-    
     }
 
+    // Represents the location of where to draw the number of dodges a player has left.
     public List<Rect> locationToDrawDodgesLeft = new List<Rect>() {
         new Rect(50f, 150f, 100f, 50f),
         new Rect(Screen.width - 400f , Screen.height - 200f, 100f, 50f)
     };
 
+    // A mapping of pressable characters to their string representations on-screen.
     public static Dictionary<PS4Pressable, string> pressableCharacterSymbolMapping = new Dictionary<PS4Pressable, string>() {
         { PS4Pressable.L1, "L1" },
         { PS4Pressable.L2, "L2" },
@@ -80,7 +83,7 @@ public class Player : MonoBehaviour
         { PS4Pressable.X, "X"}
     };
 
-    // Denotes mappings between pressable buttons and the locations of images.
+    // Denotes mappings between pressable buttons and the locations of their corresponding images.
     public static Dictionary<PS4Pressable, Texture> pressableImageMapping = new Dictionary<PS4Pressable, Texture>() {
         { PS4Pressable.L1, Resources.Load<Texture>("DuelloIcons/L1") },
         { PS4Pressable.L2, Resources.Load<Texture>("DuelloIcons/L2") },
@@ -92,23 +95,28 @@ public class Player : MonoBehaviour
         { PS4Pressable.X, Resources.Load<Texture>("DuelloIcons/ex")}
     };
 
+    // A mapping between the different pressable axes and the current and previous button states
+    // for those axes.
     private Dictionary<PS4Pressable, Dictionary<string, ButtonState>> controlAxisStateMapping;
-    public string mostRecentStatusMessage;
+    
+    public string mostRecentStatusMessage; // A message detailing the most recent happenings of this player.
+    private GUIStyle playerStatusDisplay; // A font styling detailing the most recent happenings to this player.
 
+    // Textures containing graphic representations for bullet clashing, making a mark and dodging a bullet.
     public Texture clashGraphic;
     private Texture hitGraphic;
-    public bool isDodging;
     private Texture dodgeGraphic;
-    private GUIStyle playerStatusDisplay;
+    
+    public bool isDodging; // Indicates whether the player is currently dodging a bullet.
 
     // Call this special method to load characteristics associated with this player.
     public void PreStart(int _playerNum)
     {
-        MAX_HP = Global.TEST_MODE ? 1 : 7;
+        MAX_HP = Global.TEST_MODE ? 1 : 7; // Set test map HP to 1 in test mode.
 
         bullet = Resources.Load<GameObject>("Bullet");
-        playerNum = _playerNum; // Player number
-        dodgesLeft = MAX_DODGES;
+        playerNum = _playerNum; 
+        currentDodgesLeft = MAX_DODGES;
 
         // Create style for displaying info on the control most recently pressed.
         controlDisplayStyle = new GUIStyle();
@@ -116,6 +124,7 @@ public class Player : MonoBehaviour
         controlDisplayStyle.font = Global.STENCIL;
         controlDisplayStyle.fontSize = 50;
 
+        // Create a style for displaying info on the most information on the player's status.
         playerStatusDisplay = new GUIStyle();
         playerStatusDisplay.normal.textColor = new Color(173f / 255f, 216f/ 255f, 230f/ 255f);
         playerStatusDisplay.font = Global.STENCIL;
@@ -128,7 +137,7 @@ public class Player : MonoBehaviour
         // Initialize the queue of shots to be fired at the opponent.
         queuedShots = new Queue<float>();
 
-
+        // Mappings between axes and their current and previous states.
         controlButtonStateMapping = Helper.PS4Buttons.ToDictionary(x => x, x => new Dictionary<string, ButtonState>() {
             { "currentButtonState", ButtonState.INACTIVE }, 
             { "prevButtonState", ButtonState.INACTIVE }
@@ -139,11 +148,10 @@ public class Player : MonoBehaviour
             { "prevButtonState", ButtonState.INACTIVE }
         });
 
+        mostRecentStatusMessage = ""; // At the start, nothing recent has been happening so this is blank.
 
-        mostRecentStatusMessage = "";
-
-        currentActiveKeySequence = new List<PS4Pressable>() {
-        };
+        // Represents the current sequence of keys the player is trying to match.
+        currentActiveKeySequence = new List<PS4Pressable>() { };
 
         numSymbolsPressed = 0;
 
@@ -154,6 +162,8 @@ public class Player : MonoBehaviour
         isDodging = false;
         stringRepOnScreen = "";
 
+        currentDodgesLeft = MAX_DODGES;
+
     }
 
     // Fire one shot at the opponent.
@@ -161,16 +171,19 @@ public class Player : MonoBehaviour
     {
         Bullet newBulletComponent;
 
-        // Add a fired bullet to the queue.
+        // Add a timed bullet shot to the queue.
         queuedShots.Enqueue(Time.deltaTime);
+
+        // Create and instantiate a new bullet, fire it from the player.
         newBullet = (GameObject)Instantiate(bullet, transform.position, transform.rotation);
-        if (newBullet.GetComponent<Bullet>() == null) {
-            newBulletComponent = newBullet.AddComponent<Bullet>();
-        }
         newBulletComponent = newBullet.GetComponent<Bullet>();
+        if (newBulletComponent == null) {
+            newBullet.AddComponent<Bullet>();
+            newBulletComponent = newBullet.GetComponent<Bullet>();
+        }
+        
         newBulletComponent.PreStart();
         newBulletComponent.Fire();
-
     }
 
     // Update the player control.
@@ -184,11 +197,11 @@ public class Player : MonoBehaviour
             }
 
             // Update the player to reflect pressed input controls.
-            float inputVal, inputValAbs;
             bool inputBoolVal;
 
             // Check each given possible control button/axis to see if it's been pressed/toggled.
-            foreach (PS4Control c in Enum.GetValues(typeof(PS4Control))) {
+            foreach (PS4Control c in Helper.PS4Controls) {
+
 
                 if (c.IsAny(PS4Control.L3, PS4Control.R3)) {
 
@@ -205,9 +218,9 @@ public class Player : MonoBehaviour
                             controlButtonStateMapping[c]["currentButtonState"] = ButtonState.INACTIVE;
                             controlButtonStateMapping[c]["prevButtonState"] = ButtonState.ACTIVE;
 
-                            if (dodgesLeft > 0) {
+                            if (currentDodgesLeft > 0) {
                                 mostRecentStatusMessage = "DODGE!";
-                                dodgesLeft--;
+                                currentDodgesLeft--;
                                 isDodging = true;
                             }
 
@@ -250,84 +263,6 @@ public class Player : MonoBehaviour
                 }
             }
 
-            //else {
-            //    //inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
-            //    inputVal = Input.GetAxis(Helper.GetPlayerAxis(playerNum, c));
-
-            //    // If the amount the control has been toggled is above the threshold:
-            //    if (true) {
-
-            //        if (!c.IsStick()) {
-
-            //            // Display the info if the control manipulated was NOT a stick.
-            //            stringRepOnScreen = c.ToString();
-
-            //            if (c == PS4Control.VERTICAL) {
-            //                if (inputVal > 0) {
-            //                    if (!VertAxisInUse) {
-
-            //                        if (controlAxisStateMapping[PS4Pressable.UP]["currentButtonState"] == ButtonState.INACTIVE) {
-            //                            controlAxisStateMapping[PS4Pressable.UP]["currentButtonState"] = ButtonState.ACTIVE;
-            //                            controlAxisStateMapping[PS4Pressable.UP]["prevButtonState"] = ButtonState.INACTIVE;
-            //                            FireOneShot();
-            //                        }
-            //                        VertAxisInUse = true;
-            //                    }
-            //                }
-            //                else if (inputVal < 0) {
-            //                    if (!VertAxisInUse) {
-            //                        if (controlAxisStateMapping[PS4Pressable.DOWN]["currentButtonState"] == ButtonState.INACTIVE) {
-            //                            controlAxisStateMapping[PS4Pressable.DOWN]["currentButtonState"] = ButtonState.ACTIVE;
-            //                            controlAxisStateMapping[PS4Pressable.DOWN]["prevButtonState"] = ButtonState.INACTIVE;
-            //                            FireOneShot();
-            //                        }
-            //                        VertAxisInUse = true;
-            //                    }
-            //                }
-            //                else {
-            //                    VertAxisInUse = false;
-            //                }
-            //            }
-
-            //        }
-
-            //        // Otherwise, check if the left stick has been toggled, and if so, update the most recently pressed control to 
-            //        // indicate the left stick has been pressed.
-
-            //        // If the left stick has been moved vertically (more than it has horizontally):
-            //        else if (c == PS4Control.VERTICAL_LEFT_STICK) {
-            //            if (Math.Abs(inputVal) > Math.Abs(Input.GetAxis(Helper.GetPlayerAxis(playerNum, PS4Control.HORIZONTAL_LEFT_STICK)))) {
-            //                stringRepOnScreen = c.ToString();
-            //                break;
-            //            }
-            //        }
-
-            //        // If the left stick has been moved horizontally (more than it has vertically):
-            //        else if (c == PS4Control.HORIZONTAL_LEFT_STICK) {
-            //            if (Math.Abs(inputVal) > Math.Abs(Input.GetAxis(Helper.GetPlayerAxis(playerNum, PS4Control.VERTICAL_LEFT_STICK)))) {
-            //                stringRepOnScreen = c.ToString();
-            //                break;
-            //            }
-            //        }
-
-            //    }
-            //    else {
-
-            //        foreach (PS4Pressable psp in Helper.PS4AxesPressables) {
-            //            if (controlAxisStateMapping[psp]["currentButtonState"] == ButtonState.ACTIVE) {
-            //                controlAxisStateMapping[psp]["currentButtonState"] = ButtonState.INACTIVE;
-            //                controlAxisStateMapping[psp]["prevButtonState"] = ButtonState.ACTIVE;
-            //            }
-            //        }
-
-
-
-
-            //    }
-
-
-
-            //}
         }
     }
 
@@ -341,10 +276,7 @@ public class Player : MonoBehaviour
         GUI.Label(locationToDrawHPRemaining[playerNum - 1], String.Format("HP: {0} / {1}", currentHP.ToString(),
                   MAX_HP.ToString()), controlDisplayStyle);
 
-
         // Display the message associating the status of the most recently used bullet.
-        
-
 		if (mostRecentStatusMessage == "BLOCKED!") {
             GUI.DrawTexture(locationToDrawStatusMessage, clashGraphic, ScaleMode.StretchToFill, true);
         }
@@ -359,9 +291,11 @@ public class Player : MonoBehaviour
         }
 
         // Display the message displaying the current sequence of symbols to select.
-        //GUI.Label(locationToDrawSymbolSequence[playerNum - 1], currentActiveKeySequence.ToOnScreenRep(numSymbolsPressed), controlDisplayStyle);
         int j = 0;
         foreach (PS4Pressable symbol in currentActiveKeySequence) {
+
+            // If this symbol has not been pressed yet, then draw the symbol. Make sure to increment the x by a multiple of
+            // 50 pixels
             if (j >= numSymbolsPressed) {
                 GUI.DrawTexture(baseLocationToDrawImageSymbolSequence[playerNum - 1].AddToX(50 * (j - numSymbolsPressed)), pressableImageMapping[symbol]);
             }
@@ -369,10 +303,10 @@ public class Player : MonoBehaviour
         }
 
         // Display the number of dodges on screen.
-        GUI.Label(locationToDrawDodgesLeft[playerNum - 1], String.Format("Dodges left: {0}", dodgesLeft), controlDisplayStyle);
+        GUI.Label(locationToDrawDodgesLeft[playerNum - 1], String.Format("Dodges left: {0}", currentDodgesLeft), controlDisplayStyle);
     }
 
-
+    // Decrement this player's HP by <p> points, but don't go below 0.
     internal void DecrementHP(int p)
     {
         currentHP = Math.Max(currentHP - p, 0);

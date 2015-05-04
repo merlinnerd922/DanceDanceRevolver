@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using SysRandom = System.Random;
-using UnityColor = UnityEngine.Color;
 
 // A class consisting of a bunch of helper functions.
 public class Helper
@@ -77,5 +76,11 @@ public class Helper
     internal static T GetRandom<T>(params T[] random)
     {
         return random.GetRandomItem<T>();
+    }
+
+    // Given a width and a height, return a rectangle that is centered with respect to the center of the screen.
+    public static Rect GetCenteredRect(float width, float height)
+    {
+        return new Rect(Screen.width / 2f - width / 2f, Screen.height / 2f - height / 2f, width, height);
     }
 }
