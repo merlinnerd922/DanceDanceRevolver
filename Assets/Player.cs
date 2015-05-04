@@ -108,6 +108,8 @@ public class Player : MonoBehaviour
     private Texture dodgeGraphic;
     
     public bool isDodging; // Indicates whether the player is currently dodging a bullet.
+    private ButtonState currentButtonState;
+    private Dictionary<string, ButtonState> buttonStates;
 
     // Call this special method to load characteristics associated with this player.
     public void PreStart(int _playerNum)
@@ -186,10 +188,10 @@ public class Player : MonoBehaviour
         newBulletComponent.Fire();
     }
 
-    // Update the player control.
+    // Update the player controls.
     void Update()
     {
-        if (MatchManager.matchHasBegun) {
+        if (MatchManager.matchHasBegun) { // If the match has started
 
             // Get the next sequence if there currently is no active sequence.
             if (currentActiveKeySequence.Count == 0) {
@@ -202,67 +204,71 @@ public class Player : MonoBehaviour
             // Check each given possible control button/axis to see if it's been pressed/toggled.
             foreach (PS4Control c in Helper.PS4Controls) {
 
+                inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c)); // Determine whether the button was pressed.
+                buttonStates = controlButtonStateMapping[c]; // Get the current and previous states of the given control.
+                currentButtonState = buttonStates["currentButtonState"]; // Get the current state of the button.
 
-                if (c.IsAny(PS4Control.L3, PS4Control.R3)) {
-
-                    inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
-                    if (inputBoolVal) {
-                        stringRepOnScreen = c.ToString();
-                        if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.INACTIVE) {
-                            controlButtonStateMapping[c]["currentButtonState"] = ButtonState.ACTIVE;
-                            controlButtonStateMapping[c]["prevButtonState"] = ButtonState.INACTIVE;
-                        }
+                // If we detect a button press, and the button was previously inactive, set it to active.
+                // Also, display the string representation of this control on-screen.
+                if (inputBoolVal) {
+                    stringRepOnScreen = c.ToString();
+                    if (currentButtonState == ButtonState.INACTIVE) {
+                        buttonStates["currentButtonState"] = ButtonState.ACTIVE;
+                        buttonStates["prevButtonState"] = ButtonState.INACTIVE;
                     }
-                    else {
-                        if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.ACTIVE) {
-                            controlButtonStateMapping[c]["currentButtonState"] = ButtonState.INACTIVE;
-                            controlButtonStateMapping[c]["prevButtonState"] = ButtonState.ACTIVE;
-
-                            if (currentDodgesLeft > 0) {
-                                mostRecentStatusMessage = "DODGE!";
-                                currentDodgesLeft--;
-                                isDodging = true;
-                            }
-
-                        }
-                    }
-
                 }
-
-                // For buttons, check to see if they've been pressed, and if so, update the most recently pressed control.
-                if (c.IsButton()) {
-
-                    inputBoolVal = Input.GetButton(Helper.GetPlayerAxis(playerNum, c));
-                    if (inputBoolVal) {
-                        stringRepOnScreen = c.ToString();
-                        if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.INACTIVE) {
-                            controlButtonStateMapping[c]["currentButtonState"] = ButtonState.ACTIVE;
-                            controlButtonStateMapping[c]["prevButtonState"] = ButtonState.INACTIVE;
-                        }
+                    
+                // Otherwise, if the button is active but is not being pressed, set it to inactive, 
+                // and perform all the actions necessary in response to that button press.
+                else {
+                    if (currentButtonState == ButtonState.ACTIVE) {
+                        buttonStates["currentButtonState"] = ButtonState.INACTIVE;
+                        buttonStates["prevButtonState"] = ButtonState.ACTIVE;
+                        ProcessButtonPress(c);
                     }
-                    else {
+                }
+    
+            }
 
-                        if (controlButtonStateMapping[c]["currentButtonState"] == ButtonState.ACTIVE) {
-                            controlButtonStateMapping[c]["currentButtonState"] = ButtonState.INACTIVE;
-                            controlButtonStateMapping[c]["prevButtonState"] = ButtonState.ACTIVE;
-                            if (currentActiveKeySequence[numSymbolsPressed] == c.ToPS4Pressable()) {
-                                numSymbolsPressed += 1;
-                                if (numSymbolsPressed == currentActiveKeySequence.Count) {
-                                    currentActiveKeySequence = new List<PS4Pressable>() {
-                                    };
-                                    FireOneShot();
-                                    numSymbolsPressed = 0;
-                                }
-                            }
-                            else {
-                                numSymbolsPressed = 0;
-                            }
-                        }
+        }
+    }
 
-                    }
+    // Given a PS4Control c that has just been pressed, perform the actions that correspond to it.
+    private void ProcessButtonPress(PS4Control c)
+    {
+        // A L3 or R3 press is a dodge (if there are any dodges left).
+        if (c.IsAny(PS4Control.L3, PS4Control.R3)) {
+
+            if (currentDodgesLeft > 0) {
+
+                // For a dodge, set the status message, decrement the number of available dodges, and indicate
+                // that we're now dodging a bullet.
+                mostRecentStatusMessage = "DODGE!";
+                currentDodgesLeft--;
+                isDodging = true;
+            }
+        }
+
+        // All other button presses possibly correpond to a button in the sequence of buttons to be pressed.
+        else if (c.IsButton()) {
+
+            // If the button pressed matches the requested symbol, mvoe onto the next symbol.
+            if (currentActiveKeySequence[numSymbolsPressed] == c.ToPS4Pressable()) {
+                numSymbolsPressed += 1;
+
+                // If the user has pressed all the buttons in the sequence, move onto the next sequence 
+                // and fire a bullet.
+                if (numSymbolsPressed == currentActiveKeySequence.Count) {
+                    currentActiveKeySequence = symbolsToPress.Dequeue();
+                    FireOneShot();
+                    numSymbolsPressed = 0;
                 }
             }
 
+            // Otherwise, force the user to press the sequence of buttons all over again.
+            else {
+                numSymbolsPressed = 0;
+            }
         }
     }
 

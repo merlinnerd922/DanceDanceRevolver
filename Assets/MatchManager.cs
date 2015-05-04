@@ -232,18 +232,6 @@ public class MatchManager : MonoBehaviour
                 // Player 1 fires a bullet and player 2 doesn't.
                 if (player1FiredBullet && !player2FiredBullet) {
                     PassThroughBullet(1);
-                    //playerScripts[0].queuedShots.Dequeue();
-
-                    //if (!playerScripts[0].isDodging) {
-                    //    playerScripts[1].DecrementHP(1);
-                    //    playerScripts[1].mostRecentStatusMessage = "OUCH!";
-                    //    playerScripts[0].mostRecentStatusMessage = "HIT!";
-                    //}
-                    //else {
-                    //    playerScripts[0].isDodging = false;
-                    //    playerScripts[1].mostRecentStatusMessage = "DODGE!";
-                    //    playerScripts[0].mostRecentStatusMessage = "MISSED!";
-                    //}
                 }
 
                 // Player 2 fires a bullet and player 1 doesn't.
